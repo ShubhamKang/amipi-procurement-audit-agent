@@ -1,0 +1,13 @@
+quote_id,vendor,quote_date,po_id,supplier_line,vendor_sku,description,qty,unit,quoted_total_usd,currency,source_doc
+Q-001,Aurora Craftworks,2026-09-18,PO-2601,S-01,RNG-101,14K white gold diamond solitaire ring; 1.0 ct round diamond,2,piece,409.32,USD,Quote_Aurora_2026-09-18.pdf
+Q-002,Blue Peak Metals,2026-09-18,PO-2601,S-02,EAR-202,14K YG RD diamond ear studs / pair,3,pair,604.44,USD,Quote_Blue_2026-09-18.pdf
+Q-003,Crestline Gems,2026-09-18,PO-2601,S-03,BRC-303,14K white gold diamond tennis bracelet,1,piece,714.92,USD,Quote_Crestline_2026-09-18.pdf
+Q-004,Aurora Craftworks,2026-09-18,PO-2601,S-04,PND-404,"18K yellow gold ruby pendant, one 1.5 ct center stone",2,piece,687.96,USD,Quote_Aurora_2026-09-18.pdf
+Q-005,Blue Peak Metals,2026-10-12,PO-2602,S-05,RNG-105,"14K white gold halo engagement ring, 15 diamond settings",1,piece,394.83,USD,Quote_Blue_2026-10-12.pdf
+Q-006,Crestline Gems,2026-10-12,PO-2602,S-06,,Pair of 18K RG round diamond huggies,2,pair,1110.0,USD,Quote_Crestline_2026-10-12.pdf
+Q-007,Aurora Craftworks,2026-10-12,PO-2602,S-07,NCK-307,14K white gold 2 ct diamond necklace,1,piece,798.9,USD,Quote_Aurora_2026-10-12.pdf
+Q-008,Blue Peak Metals,2026-10-12,PO-2602,S-08,BRC-408,18K yellow gold 2 ct sapphire bracelet,1,piece,845.84,USD,Quote_Blue_2026-10-12.pdf
+Q-009,Crestline Gems,2026-10-21,PO-2603,S-09,RNG-109,14K white gold pavé diamond band,2,piece,510.72,USD,Quote_Crestline_2026-10-21.pdf
+Q-010,Aurora Craftworks,2026-10-21,PO-2603,S-10,,14k YG emerald cut studs (diamond),1,pair,241.16,USD,Quote_Aurora_2026-10-21.pdf
+Q-011,Blue Peak Metals,2026-10-21,PO-2603,S-11,PND-411,18K yellow gold oval sapphire pendant,2,piece,716.8,USD,Quote_Blue_2026-10-21.pdf
+Q-012,Crestline Gems,2026-10-21,PO-2603,S-12,BRC-512,14K white gold diamond cuff bracelet,1,piece,593.56,USD,Quote_Crestline_2026-10-21.pdf
