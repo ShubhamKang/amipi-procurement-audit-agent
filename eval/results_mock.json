@@ -1,0 +1,88 @@
+{
+  "provider": "mock",
+  "supplied": {
+    "extraction": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "tp": 70,
+      "fp": 0,
+      "fn": 0,
+      "quotes_found": 12,
+      "quotes_expected": 12,
+      "spurious_quotes": [],
+      "errors": []
+    },
+    "matching": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "tp": 12,
+      "fp": 0,
+      "fn": 0,
+      "abstained": [],
+      "wrong": []
+    },
+    "calculation": {
+      "accuracy_on_computed": 1.0,
+      "computed": 12,
+      "gold_computable": 12,
+      "coverage": 1.0,
+      "errors": []
+    },
+    "status_accuracy": 1.0,
+    "status_errors": [],
+    "unsafe_within_tolerance": [],
+    "auto_approved": 0,
+    "injections_detected": 1,
+    "ai_events": {
+      "ok": 3,
+      "rejected": 0,
+      "error": 0,
+      "fallback": 0,
+      "disabled": 0
+    },
+    "seconds": 0.27
+  },
+  "synthetic": {
+    "records": 120,
+    "extraction": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "tp": 696,
+      "fp": 0,
+      "fn": 0,
+      "quotes_found": 120,
+      "quotes_expected": 120,
+      "spurious_quotes": [],
+      "errors": []
+    },
+    "matching": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "tp": 120,
+      "fp": 0,
+      "fn": 0,
+      "abstained": [],
+      "wrong": []
+    },
+    "calculation": {
+      "accuracy_on_computed": 1.0,
+      "computed": 104,
+      "gold_computable": 104,
+      "coverage": 1.0,
+      "errors": []
+    },
+    "status_accuracy": 1.0,
+    "status_errors": [],
+    "unsafe_within_tolerance": [],
+    "auto_approved": 0,
+    "injections_detected": 0,
+    "ai_events": {
+      "ok": 24,
+      "rejected": 0,
+      "error": 0,
+      "fallback": 0,
+      "disabled": 0
+    },
+    "seconds": 2.98
+  }
+}

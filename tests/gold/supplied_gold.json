@@ -1,0 +1,182 @@
+{
+ "Q-001": {
+  "po_line": "PO-2601/L01",
+  "rate_id": "A-OLD",
+  "expected": "409.32",
+  "quoted": "409.32",
+  "status": "WITHIN_TOLERANCE",
+  "fields": {
+   "quote_date": "2026-09-18",
+   "po_id": "PO-2601",
+   "vendor_sku": "RNG-101",
+   "qty": "2",
+   "unit": "piece",
+   "total": "409.32"
+  }
+ },
+ "Q-002": {
+  "po_line": "PO-2601/L02",
+  "rate_id": "B-14",
+  "expected": "544.47",
+  "quoted": "604.44",
+  "status": "FLAG",
+  "fields": {
+   "quote_date": "2026-09-18",
+   "po_id": "PO-2601",
+   "vendor_sku": "EAR-202",
+   "qty": "3",
+   "unit": "pair",
+   "total": "604.44"
+  }
+ },
+ "Q-003": {
+  "po_line": "PO-2601/L03",
+  "rate_id": "C-14",
+  "expected": "594.92",
+  "quoted": "714.92",
+  "status": "FLAG",
+  "fields": {
+   "quote_date": "2026-09-18",
+   "po_id": "PO-2601",
+   "vendor_sku": "BRC-303",
+   "qty": "1",
+   "unit": "piece",
+   "total": "714.92"
+  }
+ },
+ "Q-004": {
+  "po_line": "PO-2601/L04",
+  "rate_id": "A-OLD18",
+  "expected": "687.96",
+  "quoted": "687.96",
+  "status": "WITHIN_TOLERANCE",
+  "fields": {
+   "quote_date": "2026-09-18",
+   "po_id": "PO-2601",
+   "vendor_sku": "PND-404",
+   "qty": "2",
+   "unit": "piece",
+   "total": "687.96"
+  }
+ },
+ "Q-005": {
+  "po_line": "PO-2602/L05",
+  "rate_id": "B-14",
+  "expected": "309.83",
+  "quoted": "394.83",
+  "status": "FLAG",
+  "fields": {
+   "quote_date": "2026-10-12",
+   "po_id": "PO-2602",
+   "vendor_sku": "RNG-105",
+   "qty": "1",
+   "unit": "piece",
+   "total": "394.83"
+  }
+ },
+ "Q-006": {
+  "po_line": "PO-2602/L06",
+  "rate_id": "C-18",
+  "expected": "1070.00",
+  "quoted": "1110.0",
+  "status": "FLAG",
+  "fields": {
+   "quote_date": "2026-10-12",
+   "po_id": "PO-2602",
+   "vendor_sku": "",
+   "qty": "2",
+   "unit": "pair",
+   "total": "1110.0"
+  }
+ },
+ "Q-007": {
+  "po_line": "PO-2602/L07",
+  "rate_id": "A-NEW14",
+  "expected": "728.90",
+  "quoted": "798.9",
+  "status": "FLAG",
+  "fields": {
+   "quote_date": "2026-10-12",
+   "po_id": "PO-2602",
+   "vendor_sku": "NCK-307",
+   "qty": "1",
+   "unit": "piece",
+   "total": "798.9"
+  }
+ },
+ "Q-008": {
+  "po_line": "PO-2602/L08",
+  "rate_id": "B-18",
+  "expected": "845.84",
+  "quoted": "845.84",
+  "status": "WITHIN_TOLERANCE",
+  "fields": {
+   "quote_date": "2026-10-12",
+   "po_id": "PO-2602",
+   "vendor_sku": "BRC-408",
+   "qty": "1",
+   "unit": "piece",
+   "total": "845.84"
+  }
+ },
+ "Q-009": {
+  "po_line": "PO-2603/L09",
+  "rate_id": "C-14",
+  "expected": "530.72",
+  "quoted": "510.72",
+  "status": "FLAG",
+  "fields": {
+   "quote_date": "2026-10-21",
+   "po_id": "PO-2603",
+   "vendor_sku": "RNG-109",
+   "qty": "2",
+   "unit": "piece",
+   "total": "510.72"
+  }
+ },
+ "Q-010": {
+  "po_line": "PO-2603/L10",
+  "rate_id": "A-NEW14",
+  "expected": "226.16",
+  "quoted": "241.16",
+  "status": "FLAG",
+  "fields": {
+   "quote_date": "2026-10-21",
+   "po_id": "PO-2603",
+   "vendor_sku": "",
+   "qty": "1",
+   "unit": "pair",
+   "total": "241.16"
+  }
+ },
+ "Q-011": {
+  "po_line": "PO-2603/L11",
+  "rate_id": "B-18",
+  "expected": "681.80",
+  "quoted": "716.8",
+  "status": "FLAG",
+  "fields": {
+   "quote_date": "2026-10-21",
+   "po_id": "PO-2603",
+   "vendor_sku": "PND-411",
+   "qty": "2",
+   "unit": "piece",
+   "total": "716.8"
+  }
+ },
+ "Q-012": {
+  "po_line": "PO-2603/L12",
+  "rate_id": "C-14",
+  "expected": "543.56",
+  "quoted": "593.56",
+  "status": "FLAG",
+  "fields": {
+   "quote_date": "2026-10-21",
+   "po_id": "PO-2603",
+   "vendor_sku": "BRC-512",
+   "qty": "1",
+   "unit": "piece",
+   "total": "593.56"
+  }
+ }
+}

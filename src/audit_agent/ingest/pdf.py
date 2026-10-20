@@ -16,7 +16,7 @@ from ..models import Evidence, IngestionIssue, PolicyClause, QuoteRecord, Review
 from .parsing import to_date, to_decimal, to_text
 
 QUOTE_HEADER = re.compile(
-    r"^(?P<qid>Q-[\w-]+)\s+Date:\s*(?P<date>\S+)\s+PO:\s*(?P<po>\S+)\s+Line:\s*(?P<line>\S+)", re.I)
+    r"^(?:Quote\s*(?:No\.?|#|ID)?:?\s*)?(?P<qid>[A-Z]{1,4}-[\w-]+)\s+Date:\s*(?P<date>\S+)\s+PO:\s*(?P<po>\S+)\s+Line:\s*(?P<line>\S+)", re.I)
 VENDOR_HEADER = re.compile(r"^(?P<vendor>.+?)\s*\|\s*COMMERCIAL QUOTATIONS", re.I)
 SKU_LINE = re.compile(
     r"SKU:\s*(?P<sku>.*?)\s+QTY:\s*(?P<qty>[-\d.,]+)\s*(?P<unit>[A-Za-z]+)?\s+Total:\s*(?P<cur>USD|\$|[A-Z]{3})?\s*(?P<total>\S+)",
@@ -114,55 +114,66 @@ def _parse_quote_block(vendor: str | None, header: re.Match, block: list[tuple[i
 
 
 def parse_quotation_pages(pages: list[PageText]) -> PdfExtraction:
+    """Parse quotation/note blocks. Blocks may continue across page breaks within one file."""
     out = PdfExtraction(pages=pages)
-    for pg in pages:
-        vendor = None
-        found = False
-        cur_q: tuple[re.Match, list[tuple[int, str]]] | None = None
-        cur_n: tuple[re.Match, list[tuple[int, str]]] | None = None
+    state = {"file": None, "vendor": None, "q": None, "n": None}  # q/n: (match, [(line_no, text)], start_page, end_page)
 
-        def flush():
-            nonlocal cur_q, cur_n
-            if cur_q:
-                out.quotes.append(_parse_quote_block(vendor, cur_q[0], cur_q[1], pg.source_file, pg.page))
-                cur_q = None
-            if cur_n:
-                m, blk = cur_n
-                text = " ".join(ln for _, ln in blk[1:]).strip()
+    def page_ref(blk) -> str:
+        return f"page {blk[2]}" if blk[2] == blk[3] else f"pages {blk[2]}-{blk[3]}"
+
+    def flush():
+        if state["q"]:
+            m, lines, p0, p1 = state["q"]
+            rec = _parse_quote_block(state["vendor"], m, lines, state["file"], p0)
+            if p1 != p0:
+                rec.evidence.sheet_or_page = page_ref(state["q"])
+            out.quotes.append(rec)
+            state["q"] = None
+        if state["n"]:
+            m, blk, p0, p1 = state["n"]
+            text = " ".join(ln for _, ln in blk[1:]).strip()
+            try:
+                nd = to_date(m["date"], "note_date")
+            except ValueError:
                 nd = None
-                try:
-                    nd = to_date(m["date"], "note_date")
-                except ValueError:
-                    pass
-                out.notes.append(ReviewNote(
-                    note_id=m["nid"].upper(), vendor=m["vendor"].strip(), note_date=nd, po_id=m["po"].upper(),
-                    line_id=m["line"].upper(), text=text,
-                    evidence=Evidence(source_file=pg.source_file, sheet_or_page=f"page {pg.page}",
-                                      row_or_line=f"lines {blk[0][0]}-{blk[-1][0]}", quote=(blk[0][1] + " " + text)[:300])))
-                cur_n = None
+            out.notes.append(ReviewNote(
+                note_id=m["nid"].upper(), vendor=m["vendor"].strip(), note_date=nd, po_id=m["po"].upper(),
+                line_id=m["line"].upper(), text=text,
+                evidence=Evidence(source_file=state["file"], sheet_or_page=page_ref(state["n"]),
+                                  row_or_line=f"lines {blk[0][0]}-{blk[-1][0]}", quote=(blk[0][1] + " " + text)[:300])))
+            state["n"] = None
 
+    for pg in pages:
+        if pg.source_file != state["file"]:
+            flush()
+            state.update(file=pg.source_file, vendor=None)
+        consumed = False
         for n, ln in enumerate(pg.lines, start=1):
-            if vendor is None and (vm := VENDOR_HEADER.match(ln)):
-                vendor = vm["vendor"].strip()
+            if (vm := VENDOR_HEADER.match(ln)):
+                flush()
+                state["vendor"] = vm["vendor"].strip()
                 continue
             if (qm := QUOTE_HEADER.match(ln)):
-                flush(); found = True
-                cur_q = (qm, [(n, ln)])
+                flush(); consumed = True
+                state["q"] = (qm, [(n, ln)], pg.page, pg.page)
                 continue
             if (nm := NOTE_HEADER.match(ln)):
-                flush(); found = True
-                cur_n = (nm, [(n, ln)])
+                flush(); consumed = True
+                state["n"] = (nm, [(n, ln)], pg.page, pg.page)
                 continue
             if FOOTER.match(ln):
                 flush()
                 continue
-            if cur_q:
-                cur_q[1].append((n, ln))
-            elif cur_n:
-                cur_n[1].append((n, ln))
-        flush()
-        if not found and pg.lines:
+            for key in ("q", "n"):
+                if state[key]:
+                    m, lines, p0, _ = state[key]
+                    lines.append((n, ln))
+                    state[key] = (m, lines, p0, pg.page)
+                    consumed = True
+                    break
+        if not consumed and pg.lines:
             out.unparsed_pages.append(pg)
+    flush()
     return out
 
 
