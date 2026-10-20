@@ -1,0 +1,40 @@
+# Audit rules configuration. Values mirror Data/Contracts/Procurement_Policy_2026.pdf.
+# Change here (not in code) for live rule changes; every run records a hash of this file.
+
+tolerance_usd: "0.01"            # Rule 8: flag |variance| > tolerance
+rounding_mode: ROUND_HALF_UP     # Rule 7
+money_places: 2
+round_each_component: true       # Rule 7: metal/setting/labor rounded individually
+
+rate_selection_date: quote_date  # Rule 1: quote_date | po_due_date
+
+finish:
+  rhodium_values: ["rhodium"]    # Rule 6: case-insensitive PO finish values that trigger fee
+
+units:
+  # Rule 4: one finished unit per pair for earrings
+  pair_categories: ["earrings"]
+  piece_units: ["piece", "pc", "pcs", "unit", "each", "ea"]
+  pair_units: ["pair", "pairs", "pr"]
+
+matching:
+  auto_accept_score: 0.80        # rules-only accept threshold
+  min_margin: 0.10               # best vs runner-up
+  llm_min_confidence: 0.70       # LLM proposals below this -> NEEDS_REVIEW
+
+priority:
+  p1_abs_variance_usd: "50"
+  p2_abs_variance_usd: "0.01"
+
+security:
+  injection_patterns:
+    - "ignore (all|any|previous|prior|the)\\b"
+    - "disregard (all|any|previous|the)\\b"
+    - "mark (everything|all|this|it|them)\\s+(as\\s+)?approved"
+    - "\\bauto[- ]?approve"
+    - "approve (all|everything)"
+    - "you are (now|an?)\\s"
+    - "system prompt"
+    - "new instructions"
+    - "override (the )?(policy|rules|rate)"
+    - "do not (flag|report|review)"

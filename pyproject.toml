@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "audit-agent"
+version = "1.0.0"
+description = "AMIPI AI Procurement & Quotation Audit Agent"
+requires-python = ">=3.11"
+dependencies = []  # pinned in requirements.txt
+
+[project.scripts]
+audit = "audit_agent.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"
+markers = ["live: calls the real Gemini API (skipped unless RUN_LIVE_LLM=1)"]
