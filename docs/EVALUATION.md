@@ -1,26 +1,26 @@
 # Evaluation
 
-Reproduce: `python eval/run_eval.py --provider mock` and `--provider none` (results in `eval/results_*.json`).
+Reproduce: `python eval/run_eval.py --provider gemini|mock|none` (results in `eval/results_*.json`). Live run: `gemini-3.5-flash-lite`, 2026-10-21.
 
 - **Supplied set:** 12 quotations, gold answers in `tests/gold/supplied_gold.json` (hand-derived from the policy; see README table).
 - **Synthetic set:** 120 quotations from `eval/synth.py` (seed 7): 4 vendors, legacy/new rate cards with an Oct-1 change, Rhodium lines, earrings in pairs, SKU-less and shorthand descriptions (`YG/WG/RG`, `RD`, `14k`), overquotes, underquotes, stale-rate pricing, unstated Rhodium charges, earrings quoted per piece, quotes outside any rate period, and PDF ↔ register conflicts. Gold totals are computed by an **independent reference implementation** inside `synth.py`, not by the engine.
 
 ## Results
 
-| Metric | Supplied, mock | Synthetic, mock | Supplied, rules-only (`none`) | Synthetic, rules-only |
-|---|---|---|---|---|
-| Extraction precision (PDF fields) | 1.00 | 1.00 | 1.00 | 1.00 |
-| Extraction recall (PDF fields) | 1.00 | 1.00 | 1.00 | 1.00 |
-| Matching precision | 1.00 | 1.00 | 1.00 | 1.00 |
-| Matching recall | 1.00 | 1.00 | 0.83 | 0.80 |
-| Calculation accuracy (computed totals) | 1.00 | 1.00 | 1.00 | 1.00 |
-| Status accuracy | 1.00 | 1.00 | 0.83 | 0.80 |
-| Discrepancies shown as WITHIN_TOLERANCE (unsafe) | 0 | 0 | 0 | 0 |
-| Auto-approvals | 0 | 0 | 0 | 0 |
-| Injection detected / effective | 1 / 0 | – | 1 / 0 | – |
-| Runtime | 0.3 s | 3.0 s | 0.3 s | 3.0 s |
+| Metric | Supplied · Gemini | Synthetic · Gemini | Supplied · mock | Synthetic · mock | Supplied · rules-only | Synthetic · rules-only |
+|---|---|---|---|---|---|---|
+| Extraction precision (PDF fields) | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| Extraction recall (PDF fields) | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| Matching precision | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| Matching recall | 1.00 | 0.99 | 1.00 | 1.00 | 0.83 | 0.80 |
+| Calculation accuracy (computed totals) | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| Status accuracy | 1.00 | 0.99 | 1.00 | 1.00 | 0.83 | 0.80 |
+| Discrepancies shown as WITHIN_TOLERANCE (unsafe) | 0 | 0 | 0 | 0 | 0 | 0 |
+| Auto-approvals | 0 | 0 | 0 | 0 | 0 | 0 |
+| AI calls ok / rejected / errors | 3 / 0 / 0 | 24 / 0 / 0 | – | – | – | – |
+| Runtime | 13 s | 106 s | 0.3 s | 3.0 s | 0.3 s | 3.0 s |
 
-Interpretation: without AI the matcher **abstains** on SKU-less items (Q-006, Q-010 and synthetic `no_sku*` cases → `NEEDS_REVIEW`) but never produces a wrong match or a wrong total; the AI matcher recovers that recall. `mock` is a deterministic stand-in for the model — live Gemini results were not measured in this build because no API key was configured; run `python eval/run_eval.py --provider gemini` once `GEMINI_API_KEY` is set.
+Interpretation: without AI the matcher **abstains** on SKU-less items (Q-006, Q-010 and synthetic `no_sku*` cases → `NEEDS_REVIEW`) but never produces a wrong match or a wrong total; Gemini recovers that recall. Its only synthetic miss, S-0033 (*"Pair of 14k YG round diamond huggies"*), is a correct abstention: the synthetic PO contains two identical 14K yellow-gold huggie lines (L03, L08) and the model answered `null @ 0.40` ("multiple candidates match … cannot be determined with high confidence"), so the item went to `NEEDS_REVIEW` instead of being guessed. Gemini explanations for all 12 supplied findings passed validation (no foreign amounts, no approval claims). Runtime is dominated by the 4.5 s free-tier throttle; responses are cached for re-runs. `mock` is a deterministic offline stand-in used for tests/CI.
 
 ## Caveats
 

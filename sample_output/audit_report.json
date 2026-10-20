@@ -1,9 +1,9 @@
 {
   "run": {
-    "run_id": "20261020T204005Z-db41c2",
-    "started_at": "2026-10-20T20:40:05+00:00",
-    "finished_at": "2026-10-20T20:40:05+00:00",
-    "provider": "mock",
+    "run_id": "20261020T205936Z-a512ec",
+    "started_at": "2026-10-20T20:59:36+00:00",
+    "finished_at": "2026-10-20T20:59:36+00:00",
+    "provider": "gemini:gemini-3.5-flash-lite",
     "config_hash": "9460928031e3",
     "data_dir": "/home/shubham-kang/Documents/Projects/AMIPI_Candidate_Assignment/amipi-procurement-audit-agent/Data",
     "file_hashes": {
@@ -84,7 +84,7 @@
           "quote": "quote_id=Q-003, vendor=Crestline Gems"
         }
       ],
-      "ai_explanation": "FLAG Q-003: Quoted USD 714.92 vs policy-expected USD 594.92 (variance +120.00, overquote; tolerance 0.01, Rule 8). Rate C-14 (2026-01-01..2026-12-31) applies for quote date 2026-09-18 (Rule 1). Also noted: UNEXPLAINED_VARIANCE. No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-003 with rate C-14 (2026-01-01..2026-12-31), the absolute variance of USD 120.00 exceeds the tolerance of 0.01 under Rule 8. No single pricing error reproduces the quoted total, indicating a possible undisclosed charge. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -96,7 +96,7 @@
       "quote_date": "2026-09-18",
       "priority": "P1",
       "variance_pct": 20.17,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "sku",
         "confidence": 1.0,
@@ -222,7 +222,7 @@
           "quote": "quote_id=Q-005, vendor=Blue Peak Metals"
         }
       ],
-      "ai_explanation": "FLAG Q-005: Quoted USD 394.83 vs policy-expected USD 309.83 (variance +85.00, overquote; tolerance 0.01, Rule 8). Rate B-14 (2026-01-01..2026-12-31) applies for quote date 2026-10-12 (Rule 1). Also noted: UNEXPLAINED_VARIANCE, NOTE_VENDOR_MISMATCH, UNAUTHORIZED_SURCHARGE. No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-005 with rate B-14 (2026-01-01..2026-12-31), the absolute variance of USD 85.00 exceeds the tolerance of 0.01 under Rule 8. An unauthorized surcharge of USD 75 was claimed without a signed exception. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -234,7 +234,7 @@
       "quote_date": "2026-10-12",
       "priority": "P1",
       "variance_pct": 27.43,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "sku",
         "confidence": 1.0,
@@ -379,7 +379,7 @@
           "quote": "quote_id=Q-007, vendor=Aurora Craftworks"
         }
       ],
-      "ai_explanation": "FLAG Q-007: Quoted USD 798.90 vs policy-expected USD 728.90 (variance +70.00, overquote; tolerance 0.01, Rule 8). Rate A-NEW14 (2026-10-01..2026-12-31) applies for quote date 2026-10-12 (Rule 1). Also noted: UNEXPLAINED_VARIANCE, NOTE_VENDOR_MISMATCH, PROMPT_INJECTION_DETECTED. No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-007 with rate A-NEW14 (2026-10-01..2026-12-31), the absolute variance of USD 70.00 exceeds the tolerance of 0.01 under Rule 8. Embedded instructions in the associated notice were quarantined and ignored. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -391,7 +391,7 @@
       "quote_date": "2026-10-12",
       "priority": "P1",
       "variance_pct": 9.6,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "sku",
         "confidence": 1.0,
@@ -529,7 +529,7 @@
           "quote": "quote_id=Q-002, vendor=Blue Peak Metals"
         }
       ],
-      "ai_explanation": "FLAG Q-002: Quoted USD 604.44 vs policy-expected USD 544.47 (variance +59.97, overquote; tolerance 0.01, Rule 8). Rate B-14 (2026-01-01..2026-12-31) applies for quote date 2026-09-18 (Rule 1). Hypothesis: Rhodium finish charged although PO finish is Standard; settings counted as 4 instead of 2 (per earring instead of per pair). Also noted: FINISH_NOT_ON_PO, SETTING_COUNT_MISMATCH. No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-002 with rate B-14 (2026-01-01..2026-12-31), the absolute variance of USD 59.97 exceeds the tolerance of 0.01 under Rule 8. As a hypothesis, a rhodium finish was charged although the PO finish is standard violating Rule 6, and settings were counted as 4 instead of 2 violating Rule 3 and Rule 4. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -541,7 +541,7 @@
       "quote_date": "2026-09-18",
       "priority": "P1",
       "variance_pct": 11.01,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "sku",
         "confidence": 1.0,
@@ -675,7 +675,7 @@
           "quote": "C-14 Crestline Gems 14K effective 2026-01-01..2026-12-31; Supplier C"
         }
       ],
-      "ai_explanation": "FLAG Q-012: Quoted USD 593.56 vs policy-expected USD 543.56 (variance +50.00, overquote; tolerance 0.01, Rule 8). Rate C-14 (2026-01-01..2026-12-31) applies for quote date 2026-10-21 (Rule 1). Also noted: UNEXPLAINED_VARIANCE. No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-012 with rate C-14 (2026-01-01..2026-12-31), the absolute variance of USD 50.00 exceeds the tolerance of 0.01 under Rule 8 with an unexplained variance. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -687,7 +687,7 @@
       "quote_date": "2026-10-21",
       "priority": "P1",
       "variance_pct": 9.2,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "sku",
         "confidence": 1.0,
@@ -815,7 +815,7 @@
           "quote": "quote_id=Q-006, vendor=Crestline Gems"
         }
       ],
-      "ai_explanation": "FLAG Q-006: Quoted USD 1110.00 vs policy-expected USD 1070.00 (variance +40.00, overquote; tolerance 0.01, Rule 8). Rate C-18 (2026-01-01..2026-12-31) applies for quote date 2026-10-12 (Rule 1). Also noted: MISSING_SKU, UNEXPLAINED_VARIANCE, NOTE_VENDOR_MISMATCH, DUPLICATE_NOTICE, HISTORY_UNMAPPED. No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-006 with rate C-18 (2026-01-01..2026-12-31), the absolute variance of USD 40.00 exceeds the tolerance of 0.01 under Rule 8. The supplier did not provide a SKU. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -827,13 +827,13 @@
       "quote_date": "2026-10-12",
       "priority": "P2",
       "variance_pct": 3.74,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "rules+llm",
-        "confidence": 0.742,
+        "confidence": 0.792,
         "trustworthy": true,
         "proposed_po_line_key": null,
-        "rationale": "AI (mock) chose PO-2602/L06 @ 0.90: mock: attribute and token similarity (grade, colour, type, stone) | rules top PO-2602/L06 @ 0.58"
+        "rationale": "AI (gemini:gemini-3.5-flash-lite) chose PO-2602/L06 @ 1.00: The quotation specifies 18K RG (rose gold) round diamond huggies, which matches candidate PO-2602/L06 for 18K rose gold diamond huggie hoops. | rules top PO-2602/L06 @ 0.58"
       },
       "calculation": {
         "rate_id": "C-18",
@@ -963,7 +963,7 @@
           "quote": "B-18 Blue Peak Metals 18K effective 2026-01-01..2026-12-31; Supplier B"
         }
       ],
-      "ai_explanation": "FLAG Q-011: Quoted USD 716.80 vs policy-expected USD 681.80 (variance +35.00, overquote; tolerance 0.01, Rule 8). Rate B-18 (2026-01-01..2026-12-31) applies for quote date 2026-10-21 (Rule 1). Also noted: UNEXPLAINED_VARIANCE. No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-011 with rate B-18 (2026-01-01..2026-12-31), the absolute variance of USD 35.00 exceeds the tolerance of 0.01 under Rule 8 with an unexplained variance. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -975,7 +975,7 @@
       "quote_date": "2026-10-21",
       "priority": "P2",
       "variance_pct": 5.13,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "sku",
         "confidence": 1.0,
@@ -1087,7 +1087,7 @@
           "quote": "C-14 Crestline Gems 14K effective 2026-01-01..2026-12-31; Supplier C"
         }
       ],
-      "ai_explanation": "FLAG Q-009: Quoted USD 510.72 vs policy-expected USD 530.72 (variance -20.00, underquote; tolerance 0.01, Rule 8). Rate C-14 (2026-01-01..2026-12-31) applies for quote date 2026-10-21 (Rule 1). Also noted: UNEXPLAINED_VARIANCE. No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-009 with rate C-14 (2026-01-01..2026-12-31), the absolute variance of USD 20.00 exceeds the tolerance of 0.01. Underquotes must be identified and not automatically rejected pursuant to Rule 8. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -1099,7 +1099,7 @@
       "quote_date": "2026-10-21",
       "priority": "P2",
       "variance_pct": -3.77,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "sku",
         "confidence": 1.0,
@@ -1212,7 +1212,7 @@
           "quote": "A-NEW14 Aurora Craftworks 14K effective 2026-10-01..2026-12-31; New policy applies by quotation date."
         }
       ],
-      "ai_explanation": "FLAG Q-010: Quoted USD 241.16 vs policy-expected USD 226.16 (variance +15.00, overquote; tolerance 0.01, Rule 8). Rate A-NEW14 (2026-10-01..2026-12-31) applies for quote date 2026-10-21 (Rule 1). Hypothesis: Rhodium finish charged although PO finish is Standard. Also noted: MISSING_SKU, FINISH_NOT_ON_PO. No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-010 with rate A-NEW14 (2026-10-01..2026-12-31), the absolute variance of USD 15.00 exceeds the tolerance of 0.01 under Rule 8. As a hypothesis, a rhodium finish was charged although the PO finish is standard, violating Rule 6. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -1224,13 +1224,13 @@
       "quote_date": "2026-10-21",
       "priority": "P2",
       "variance_pct": 6.63,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "rules+llm",
-        "confidence": 0.775,
+        "confidence": 0.8,
         "trustworthy": true,
         "proposed_po_line_key": null,
-        "rationale": "AI (mock) chose PO-2603/L10 @ 0.95: mock: attribute and token similarity (grade, colour, type, stone) | rules top PO-2603/L10 @ 0.60"
+        "rationale": "AI (gemini:gemini-3.5-flash-lite) chose PO-2603/L10 @ 1.00: Both items match 14K yellow gold, emerald-cut diamond stud earrings for a pair. | rules top PO-2603/L10 @ 0.60"
       },
       "calculation": {
         "rate_id": "A-NEW14",
@@ -1361,7 +1361,7 @@
           "quote": "quote_id=Q-001, vendor=Aurora Craftworks"
         }
       ],
-      "ai_explanation": "WITHIN_TOLERANCE Q-001: Quoted USD 409.32 vs policy-expected USD 409.32 (variance +0.00, exact match; tolerance 0.01, Rule 8). Rate A-OLD (2026-01-01..2026-09-30) applies for quote date 2026-09-18 (Rule 1). Also noted: RATE_CHANGE_NOTICE_IGNORED. No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-001 with rate A-OLD (2026-01-01..2026-09-30), the quote date governs applicability under Rule 1. The variance is within tolerance. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -1373,7 +1373,7 @@
       "quote_date": "2026-09-18",
       "priority": "P3",
       "variance_pct": 0.0,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "sku",
         "confidence": 1.0,
@@ -1484,7 +1484,7 @@
           "quote": "quote_id=Q-004, vendor=Aurora Craftworks"
         }
       ],
-      "ai_explanation": "WITHIN_TOLERANCE Q-004: Quoted USD 687.96 vs policy-expected USD 687.96 (variance +0.00, exact match; tolerance 0.01, Rule 8). Rate A-OLD18 (2026-01-01..2026-09-30) applies for quote date 2026-09-18 (Rule 1). No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-004 with rate A-OLD18 (2026-01-01..2026-09-30), the quote date governs under Rule 1 and the variance is within tolerance. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -1496,7 +1496,7 @@
       "quote_date": "2026-09-18",
       "priority": "P3",
       "variance_pct": 0.0,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "sku",
         "confidence": 1.0,
@@ -1593,7 +1593,7 @@
           "quote": "quote_id=Q-008, vendor=Blue Peak Metals"
         }
       ],
-      "ai_explanation": "WITHIN_TOLERANCE Q-008: Quoted USD 845.84 vs policy-expected USD 845.84 (variance +0.00, exact match; tolerance 0.01, Rule 8). Rate B-18 (2026-01-01..2026-12-31) applies for quote date 2026-10-12 (Rule 1). No automatic approval; a human reviewer decision is required (Rule 10).",
+      "ai_explanation": "For quote Q-008 with rate B-18 (2026-01-01..2026-12-31), the variance is within tolerance and expected costs match correctly. A human reviewer decision is required.",
       "human_review": {
         "decision": "pending",
         "reviewer": null,
@@ -1605,7 +1605,7 @@
       "quote_date": "2026-10-12",
       "priority": "P3",
       "variance_pct": 0.0,
-      "explanation_source": "template (mock provider)",
+      "explanation_source": "gemini:gemini-3.5-flash-lite",
       "match": {
         "method": "sku",
         "confidence": 1.0,
@@ -1752,23 +1752,23 @@
     {
       "task": "match",
       "status": "ok",
-      "detail": "PO-2602/L06 @ 0.90",
+      "detail": "PO-2602/L06 @ 1.00",
       "ref": "Q-006",
-      "ts": "2026-10-20T20:40:05+00:00"
+      "ts": "2026-10-20T20:59:36+00:00"
     },
     {
       "task": "match",
       "status": "ok",
-      "detail": "PO-2603/L10 @ 0.95",
+      "detail": "PO-2603/L10 @ 1.00",
       "ref": "Q-010",
-      "ts": "2026-10-20T20:40:05+00:00"
+      "ts": "2026-10-20T20:59:36+00:00"
     },
     {
       "task": "explain",
       "status": "ok",
       "detail": "12/12 AI explanations accepted",
       "ref": "",
-      "ts": "2026-10-20T20:40:05+00:00"
+      "ts": "2026-10-20T20:59:36+00:00"
     }
   ]
 }

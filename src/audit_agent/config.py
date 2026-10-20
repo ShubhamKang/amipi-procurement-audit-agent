@@ -121,7 +121,7 @@ def load_llm_settings(provider_override: str | None = None) -> LLMSettings:
     return LLMSettings(
         provider=provider,
         api_key=os.getenv("GEMINI_API_KEY") or None,
-        model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite"),
+        model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite"),
         timeout_s=float(os.getenv("LLM_TIMEOUT_S", "30")),
         max_retries=int(os.getenv("LLM_MAX_RETRIES", "3")),
         min_interval_s=float(os.getenv("LLM_MIN_INTERVAL_S", "4.5")),

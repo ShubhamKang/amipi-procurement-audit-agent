@@ -31,7 +31,7 @@ python eval/run_eval.py --provider mock                  # evaluation report (su
 |---|---|---|
 | `LLM_PROVIDER` | `mock` | `gemini` (remote), `mock` (offline deterministic stand-in), `none` (rules only, no AI) |
 | `GEMINI_API_KEY` | – | Free key from https://aistudio.google.com → *Get API key* |
-| `GEMINI_MODEL` | `gemini-2.5-flash-lite` | Any current free-tier Flash / Flash-Lite model id |
+| `GEMINI_MODEL` | `gemini-3.5-flash-lite` | Any current free-tier Flash / Flash-Lite model id |
 | `LLM_TIMEOUT_S` / `LLM_MAX_RETRIES` | `30` / `3` | Per-call timeout, retries with exponential backoff on 429/5xx |
 | `LLM_MIN_INTERVAL_S` | `4.5` | Client-side throttle to respect free-tier RPM |
 | `LLM_EXPLAIN` | `1` | Set `0` to skip AI explanations (deterministic templates only) |
@@ -93,7 +93,7 @@ Rules live in [`config/policy.yaml`](config/policy.yaml) (tolerance, rounding mo
 
 ## AI model choice, data sent and cost
 
-- **Model:** Gemini 2.5 Flash-Lite (configurable). Chosen because it has a free tier (no billing needed for this assessment), supports JSON-schema structured output, low latency, and the tasks (short classification/extraction/summary) do not need a large model. Temperature 0.
+- **Model:** Gemini 3.5 Flash-Lite (configurable; `gemini-2.5-flash-lite` is no longer available to new keys). Chosen because it has a free tier (no billing needed for this assessment), supports JSON-schema structured output, low latency, and the tasks (short classification/extraction/summary) do not need a large model. Temperature 0.
 - **Data transmitted** (only when `LLM_PROVIDER=gemini`): quotation line text (vendor, PO, SKU, description, qty) for SKU-less matches; PO line descriptions of candidate lines; policy clause text; computed finding facts for explanations; text of PDF pages the deterministic parser could not read. Pages containing detected injections are never sent. No API keys or reviewer data are sent. Note that Google may use free-tier prompts to improve its products — fine for this fictional data; use a paid tier or `mock`/`none` for real data.
 - **Calls per run (supplied data):** 2 match calls + 1 batched explanation call (≈ 6–8k tokens total); cached on re-runs.
 - **Approximate cost:** $0 on the free tier. On paid Flash-Lite pricing (~$0.10 / 1M input, ~$0.40 / 1M output tokens; check Google's pricing page) a 12-quote run is ≈ $0.001 and 1,000 quotations ≈ $0.10–0.30.
@@ -124,7 +124,7 @@ Data/                supplied fictional input package
 
 - No OCR: scanned PDFs without a text layer are reported (`NO_TEXT_LAYER`) and their lines would need manual entry.
 - The deterministic PDF parser targets the supplied layout; other layouts rely on AI extraction (grounded but less certain, flagged `AI_EXTRACTED`).
-- Explanations, extraction and matching were verified offline with the mock provider; live Gemini output quality depends on the selected model, and free-tier rate limits make large batches slow (use `--provider mock`/`none` or `--no-explain` for batches).
+- Live Gemini was evaluated on the supplied set and 120 synthetic records (see EVALUATION.md); quality on other models is not measured. Free-tier rate limits make large batches slow (~1 s/record incl. throttle; use `--no-explain` or `--provider none` for big batches).
 - No authentication/role-based approval; single-user SQLite ledger (fine locally, not for concurrent multi-user use).
 - No FX conversion (non-USD quotes → `NEEDS_REVIEW`), no multi-currency rate cards.
 - Surcharge exceptions are detected from note text only; there is no signed-exception document registry.
