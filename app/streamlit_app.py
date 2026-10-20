@@ -55,7 +55,7 @@ def execute(data_dir: Path, provider: str, overrides: dict, explain: bool):
 # ----------------------------------------------------------------------------- sidebar
 with st.sidebar:
     st.markdown(f'<div style="display:flex;gap:10px;align-items:center">{diamond(34, "s")}'
-                '<div><div class="serif" style="font-size:1.5rem;color:#F6E7B8;line-height:1">AMIPI</div>'
+                '<div><div class="wordmark">AMIPI</div>'
                 '<div style="font-size:.72rem;letter-spacing:2px">AUDIT ATELIER</div></div></div>', unsafe_allow_html=True)
     st.markdown("---")
     st.markdown("### Audit run")
@@ -104,8 +104,8 @@ M = run.metrics
 # ----------------------------------------------------------------------------- hero
 st.markdown(f"""
 <div class="hero"><div class="row">
-  {diamond(58, "h")}
-  <div><h1>Quotation Audit Atelier</h1>
+  {diamond(50, "h")}
+  <div><div class="eyebrow">AMIPI · Procurement Audit · Fine Jewellery</div><h1>Quotation Audit Atelier</h1>
   <div class="tag">Every carat, gram and setting — reconciled against policy, with evidence you can trace.</div></div>
   <div class="meta">Run <b>{esc(run.run_id)}</b><br>AI provider <b>{esc(run.provider)}</b><br>
   Rules <b>{esc(run.config_hash)}</b> · tolerance <b>${run.settings.tolerance}</b> · {esc(run.settings.rounding_mode)}</div>
@@ -113,12 +113,12 @@ st.markdown(f"""
 
 pending = sum(f.human_review.decision == "pending" for f in run.findings)
 st.markdown(V.kpi_row([
-    V.kpi("Quotations", str(M["quotations"]), f"from {M['source_records']} source records · de-duplicated"),
-    V.kpi("Flagged · Ruby", str(M["flag"]), "variance above tolerance", RUBY),
-    V.kpi("Needs review · Topaz", str(M["needs_review"]), "insufficient evidence", TOPAZ),
-    V.kpi("Within tolerance · Emerald", str(M["within_tolerance"]), "still awaiting sign-off", EMERALD),
-    V.kpi("Net overquote", f"${M['overquote_usd']:,.2f}", f"underquotes ${M['underquote_usd']:,.2f}", RUBY),
-    V.kpi("Pending decisions", str(pending), f"auto-approved: {M['auto_approved']}", SAPPHIRE),
+    V.kpi("Quotations", str(M["quotations"]), f"from {M['source_records']} records, de-duplicated"),
+    V.kpi("Flagged", str(M["flag"]), "ruby · above tolerance", RUBY),
+    V.kpi("Needs review", str(M["needs_review"]), "topaz · insufficient evidence", TOPAZ),
+    V.kpi("Within tolerance", str(M["within_tolerance"]), "emerald · awaiting sign-off", EMERALD),
+    V.kpi("Net overquote", f"${M['overquote_usd']:,.2f}", f"underquotes −${abs(M['underquote_usd']):,.2f}", RUBY),
+    V.kpi("Pending review", str(pending), f"auto-approved: {M['auto_approved']}", SAPPHIRE),
 ]), unsafe_allow_html=True)
 
 if M["injections_detected"]:

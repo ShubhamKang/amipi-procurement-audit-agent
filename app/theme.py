@@ -69,120 +69,136 @@ def code_chip(code: str, severity: str = "info") -> str:
     return f'<span class="code" style="color:{col};border-color:{col}55">{esc(code)}</span>'
 
 
+# Typography (all sans, classic maison style):
+#   Josefin Sans – Art-Deco display caps (wordmark, labels, tabs)
+#   Jost         – geometric, Futura-like headings and figures
+#   Mulish       – quiet, highly legible body text
+DISPLAY = "'Josefin Sans', 'Futura', 'Century Gothic', sans-serif"
+HEAD = "'Jost', 'Futura', 'Avenir Next', sans-serif"
+BODY = "'Mulish', 'Avenir', 'Segoe UI', system-ui, sans-serif"
+
 CSS = f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Jost:wght@400;500;600&family=Mulish:wght@400;500;600;700&display=swap');
 
-:root {{ --gold:{GOLD}; --gold-deep:{GOLD_DEEP}; --midnight:{MIDNIGHT}; --ivory:{IVORY}; }}
+:root {{ --gold:{GOLD}; --gold-deep:{GOLD_DEEP}; --midnight:{MIDNIGHT}; --ivory:{IVORY}; --rule:#D9CCAE; --paper:#FFFDF8; }}
 html, body, [class*="css"], .stMarkdown, .stText, p, li, label, input, textarea, .stSelectbox, .stDataFrame {{
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: {BODY};
 }}
-h1, h2, h3, h4, .serif {{ font-family: 'Cormorant Garamond', 'Times New Roman', serif !important; letter-spacing:.2px; color: var(--midnight); }}
-.stApp {{
-  background:
-    radial-gradient(1200px 400px at 85% -10%, rgba(201,162,74,.12), transparent 60%),
-    radial-gradient(900px 300px at -10% 0%, rgba(20,27,45,.06), transparent 60%),
-    var(--ivory);
-}}
-.block-container {{ padding-top: 1.2rem; max-width: 1400px; }}
-header[data-testid="stHeader"] {{ background: transparent; }}
+h1, h2, h3, h4 {{ font-family: {HEAD} !important; font-weight:500 !important; color: var(--midnight); letter-spacing:.2px; }}
+.stApp {{ background: var(--ivory); }}
 
-/* ---------- hero ---------- */
+/* ---------- full-width canvas: remove Streamlit's side gutters ---------- */
+.block-container, [data-testid="stMainBlockContainer"] {{
+  max-width: 100% !important; padding: 0.9rem 1.4rem 2rem 1.4rem !important;
+}}
+header[data-testid="stHeader"] {{ background: transparent; height: 0; }}
+
+/* ---------- masthead: midnight band framed by a double gold rule ---------- */
 .hero {{
-  position: relative; overflow: hidden; border-radius: 18px; padding: 26px 32px; margin-bottom: 18px;
-  background: linear-gradient(120deg, #141B2D 0%, #1F2A44 55%, #2B2A3F 100%);
-  border: 1px solid rgba(201,162,74,.45); box-shadow: 0 18px 40px -22px rgba(20,27,45,.55);
+  position: relative; padding: 22px 28px; margin: 0 0 0 0; background: var(--midnight);
+  border-top: 3px double var(--gold); border-bottom: 3px double var(--gold);
 }}
-.hero:after {{
-  content:""; position:absolute; inset:0;
-  background: repeating-linear-gradient(115deg, rgba(255,255,255,.035) 0 2px, transparent 2px 22px);
-  pointer-events:none;
+.hero:before, .hero:after {{
+  content:""; position:absolute; width:18px; height:18px; border: 1px solid var(--gold);
 }}
-.hero .row {{ display:flex; align-items:center; gap:18px; position:relative; z-index:1; }}
-.hero h1 {{ color:#F6E7B8 !important; margin:0; font-size: 2.35rem; font-weight:600; line-height:1.1; }}
-.hero .tag {{ color:#D9CDB0; font-size:.95rem; margin-top:4px; letter-spacing:.3px; }}
-.hero .meta {{ margin-left:auto; text-align:right; color:#CBBF9F; font-size:.8rem; line-height:1.5; }}
-.hero .meta b {{ color:#F6E7B8; font-weight:600; }}
-.goldline {{ height:2px; border:0; margin: 8px 0 18px 0;
-  background: linear-gradient(90deg, transparent, var(--gold), #F6E7B8, var(--gold), transparent); }}
+.hero:before {{ top:8px; left:8px; border-right:0; border-bottom:0; }}
+.hero:after {{ bottom:8px; right:8px; border-left:0; border-top:0; }}
+.hero .row {{ display:flex; align-items:center; gap:20px; }}
+.hero .eyebrow {{ font-family:{DISPLAY}; font-size:.7rem; letter-spacing:5px; text-transform:uppercase; color:var(--gold); }}
+.hero h1 {{ font-family:{DISPLAY} !important; color:#F3E6C4 !important; margin:4px 0 2px; font-size:1.75rem; white-space:nowrap;
+  font-weight:600 !important; letter-spacing:4px; text-transform:uppercase; line-height:1.15; padding:0; }}
+.hero .tag {{ color:#C9BEA2; font-size:.9rem; letter-spacing:.3px; }}
+.hero .meta {{ margin-left:auto; text-align:right; color:#A99E84; font-size:.74rem; line-height:1.8;
+  border-left:1px solid rgba(168,134,47,.5); padding-left:20px; text-transform:uppercase; letter-spacing:1.5px; }}
+.hero .meta b {{ color:#F3E6C4; font-weight:600; font-family:{HEAD}; letter-spacing:.5px; text-transform:none; font-size:.82rem; }}
+.wordmark {{ font-family:{DISPLAY}; font-size:1.25rem; font-weight:700; letter-spacing:6px; color:#F3E6C4; line-height:1; }}
+.goldline {{ height:0; border:0; border-top:1px solid var(--gold); margin: 6px 0 14px; }}
 
-/* ---------- KPI cards ---------- */
-.kpis {{ display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:14px; margin: 6px 0 18px; }}
-.kpi {{
-  background: #FFFDF8; border:1px solid #E7DCC4; border-radius:14px; padding:14px 16px 12px;
-  box-shadow: 0 6px 18px -14px rgba(122,95,30,.45); position:relative;
-}}
-.kpi:before {{ content:""; position:absolute; top:0; left:16px; right:16px; height:3px; border-radius:0 0 3px 3px; background: var(--accent, var(--gold)); }}
-.kpi .label {{ font-size:.72rem; text-transform:uppercase; letter-spacing:1.4px; color:#6E6352; }}
-.kpi .value {{ font-family:'Cormorant Garamond', serif; font-size:2rem; font-weight:700; color: var(--midnight); line-height:1.15; }}
-.kpi .sub {{ font-size:.78rem; color:#7B705E; }}
+/* ---------- KPI ledger: one ruled strip, no floating cards ---------- */
+.kpis {{ display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin: 0 0 18px;
+  background: var(--paper); border-bottom:1px solid var(--rule); }}
+.kpi {{ display:flex; flex-direction:column; padding:14px 18px 12px; border-right:1px solid var(--rule); position:relative; }}
+.kpi:last-child {{ border-right:0; }}
+.kpi:before {{ content:""; position:absolute; top:16px; left:18px; width:7px; height:7px; transform:rotate(45deg); background:var(--accent, var(--gold)); }}
+.kpi .label {{ font-family:{DISPLAY}; font-size:.64rem; text-transform:uppercase; letter-spacing:1.6px; color:#6E6352; padding-left:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }}
+.kpi .value {{ font-family:{HEAD}; font-size:2rem; font-weight:400; color: var(--midnight); line-height:1.2;
+  font-variant-numeric: tabular-nums lining-nums; margin-top:4px; }}
+.kpi .sub {{ font-size:.74rem; color:#7B705E; }}
 
-/* ---------- chips ---------- */
-.chip {{ display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:999px; border:1px solid;
-  font-size:.78rem; font-weight:600; white-space:nowrap; }}
-.chip .gem {{ width:9px; height:9px; transform: rotate(45deg); border-radius:2px; display:inline-block; box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }}
-.chip .gemname {{ font-weight:400; opacity:.75; }}
-.chip.pri {{ padding:3px 9px; letter-spacing:.5px; }}
-.code {{ display:inline-block; font: 500 .72rem 'Inter', monospace; padding:2px 8px; margin:2px 4px 2px 0; border-radius:6px;
-  border:1px solid; background:#FFFDF8; }}
+/* ---------- chips: lozenge tags with a cut-gem marker ---------- */
+.chip {{ display:inline-flex; align-items:center; gap:7px; padding:3px 10px; border-radius:2px; border:1px solid;
+  font-family:{DISPLAY}; font-size:.7rem; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; white-space:nowrap; }}
+.chip .gem {{ width:8px; height:8px; transform: rotate(45deg); display:inline-block; }}
+.chip .gemname {{ font-weight:400; opacity:.7; }}
+.chip.pri {{ padding:3px 8px; letter-spacing:1.5px; }}
+.code {{ display:inline-block; font: 600 .68rem {HEAD}; letter-spacing:.6px; padding:2px 7px; margin:2px 4px 2px 0;
+  border-radius:0; border:1px solid; background:var(--paper); }}
 
-/* ---------- panels ---------- */
-.panel {{ background:#FFFDF8; border:1px solid #E7DCC4; border-radius:16px; padding:18px 20px; margin-bottom:14px;
-  box-shadow: 0 10px 24px -20px rgba(20,27,45,.4); }}
-.panel h3 {{ margin: 0 0 8px; font-size:1.45rem; }}
-.panel .muted {{ color:#6E6352; font-size:.86rem; }}
-.facet {{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #E7DCC4; font-size:.9rem; }}
+/* ---------- panels: ruled paper sheets ---------- */
+.panel {{ background:var(--paper); border:1px solid var(--rule); border-top:2px solid var(--midnight); padding:16px 20px; margin-bottom:14px; }}
+.panel h3 {{ margin: 0 0 10px; font-family:{DISPLAY} !important; font-size:.82rem; font-weight:700 !important;
+  letter-spacing:3px; text-transform:uppercase; color:var(--gold-deep); padding-bottom:8px; border-bottom:1px solid var(--rule); }}
+.panel .muted {{ color:#6E6352; font-size:.85rem; }}
+.facet {{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dotted var(--rule); font-size:.88rem; }}
 .facet:last-child {{ border-bottom:0; }}
 .facet span:first-child {{ color:#6E6352; }}
 .facet span:last-child {{ font-weight:600; color:var(--midnight); text-align:right; }}
-.amount {{ font-family:'Cormorant Garamond', serif; font-size:1.9rem; font-weight:700; }}
+.amount {{ font-family:{HEAD}; font-size:1.85rem; font-weight:400; font-variant-numeric: tabular-nums; }}
 .var-pos {{ color:{RUBY}; }} .var-neg {{ color:{SAPPHIRE}; }} .var-zero {{ color:{EMERALD}; }}
 
-.calc {{ width:100%; border-collapse:collapse; font-size:.88rem; }}
-.calc td {{ padding:6px 4px; border-bottom:1px solid #F0E8D6; }}
-.calc td:last-child {{ text-align:right; font-variant-numeric: tabular-nums; font-weight:600; }}
-.calc tr.total td {{ border-top:2px solid var(--gold); border-bottom:0; font-size:1rem; }}
-.calc .f {{ color:#7B705E; font-size:.78rem; }}
+.calc {{ width:100%; border-collapse:collapse; font-size:.87rem; }}
+.calc td {{ padding:6px 4px; border-bottom:1px dotted var(--rule); }}
+.calc td:last-child {{ text-align:right; font-family:{HEAD}; font-variant-numeric: tabular-nums; font-weight:500; }}
+.calc tr.total td {{ border-top:3px double var(--gold); border-bottom:0; font-size:1rem; font-weight:600; }}
+.calc .f {{ color:#7B705E; font-size:.76rem; }}
 
-.ev {{ border-left:3px solid var(--gold); background:#FBF6EA; border-radius:0 10px 10px 0; padding:8px 12px; margin:8px 0; }}
-.ev .src {{ font-size:.75rem; letter-spacing:.4px; color:var(--gold-deep); font-weight:600; text-transform:uppercase; }}
-.ev .q {{ font-size:.86rem; color:#2E2820; margin-top:2px; word-break: break-word; }}
-.cite {{ border-left:3px solid {SAPPHIRE}; background:#F1F5FB; }}
+.ev {{ border-left:2px solid var(--gold); background:#F8F2E3; padding:8px 12px; margin:8px 0; }}
+.ev .src {{ font-family:{DISPLAY}; font-size:.66rem; letter-spacing:1.8px; color:var(--gold-deep); font-weight:700; text-transform:uppercase; }}
+.ev .q {{ font-size:.85rem; color:#2E2820; margin-top:3px; word-break: break-word; }}
+.cite {{ border-left-color:{SAPPHIRE}; background:#EFF3F9; }}
 .cite .src {{ color:{SAPPHIRE}; }}
-.warn {{ border-left:3px solid {RUBY}; background:#FBEAEC; }}
+.warn {{ border-left-color:{RUBY}; background:#FAECEE; }}
 .warn .src {{ color:{RUBY}; }}
 
-.explain {{ background: linear-gradient(135deg,#FFFDF8,#F8F0DC); border:1px solid #E7DCC4; border-radius:14px; padding:14px 16px; font-size:.93rem; }}
-.explain .who {{ font-size:.72rem; letter-spacing:1px; text-transform:uppercase; color:var(--gold-deep); margin-bottom:4px; }}
+.explain {{ background:var(--paper); border:1px solid var(--rule); border-left:3px double var(--gold); padding:12px 16px; font-size:.92rem; }}
+.explain .who {{ font-family:{DISPLAY}; font-size:.64rem; letter-spacing:2.2px; text-transform:uppercase; color:var(--gold-deep); margin-bottom:4px; }}
 
-.ornament {{ text-align:center; color:var(--gold); letter-spacing:10px; font-size:.8rem; margin: 6px 0 2px; }}
-.footer {{ text-align:center; color:#8B806C; font-size:.78rem; margin-top:28px; }}
+.ornament {{ text-align:center; color:var(--gold); letter-spacing:12px; font-size:.7rem; margin: 8px 0 4px; }}
+.footer {{ text-align:center; color:#8B806C; font-family:{DISPLAY}; font-size:.68rem; letter-spacing:2px; text-transform:uppercase; margin-top:28px; }}
 
-/* ---------- streamlit widgets ---------- */
-section[data-testid="stSidebar"] {{ background: linear-gradient(180deg, #141B2D 0%, #1C2438 100%); border-right:1px solid rgba(201,162,74,.35); }}
-section[data-testid="stSidebar"] * {{ color:#E9DFC6 !important; }}
-section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {{ color:#F6E7B8 !important; }}
+/* ---------- sidebar: midnight vitrine ---------- */
+section[data-testid="stSidebar"] {{ background: var(--midnight); border-right:1px solid var(--gold); }}
+section[data-testid="stSidebar"] * {{ color:#E2D8BF !important; }}
+section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {{
+  font-family:{DISPLAY} !important; color:#F3E6C4 !important; letter-spacing:3px; text-transform:uppercase; font-size:.95rem !important; }}
 section[data-testid="stSidebar"] [data-baseweb="select"] > div,
-section[data-testid="stSidebar"] input {{ background:#222B42 !important; border-color:#4A4636 !important; }}
+section[data-testid="stSidebar"] input {{ background:#1D2539 !important; border-color:#4A4636 !important; border-radius:2px !important; }}
 section[data-testid="stSidebar"] .stButton button {{ width:100%; }}
 section[data-testid="stSidebar"] .stButton button, section[data-testid="stSidebar"] .stButton button * {{ color:#141B2D !important; }}
-section[data-testid="stSidebar"] div[data-testid="stExpander"] {{ background:#1F2840 !important; border-color:#4A4636 !important; }}
-section[data-testid="stSidebar"] div[data-testid="stExpander"] summary {{ background:#1F2840 !important; }}
-section[data-testid="stSidebar"] [data-testid="stNumberInput"] button {{ background:#2A3450 !important; }}
+section[data-testid="stSidebar"] div[data-testid="stExpander"],
+section[data-testid="stSidebar"] div[data-testid="stExpander"] summary {{ background:#1A2134 !important; border-color:#4A4636 !important; }}
+section[data-testid="stSidebar"] [data-testid="stNumberInput"] button {{ background:#262F48 !important; }}
 section[data-testid="stSidebar"] [data-testid="stAlert"] * {{ color:#141B2D !important; }}
+
+/* ---------- buttons, tabs, tables ---------- */
 .stButton button, .stDownloadButton button, .stFormSubmitButton button {{
-  border-radius:999px; border:1px solid var(--gold); color:#141B2D; font-weight:600;
-  background: linear-gradient(180deg,#F6E7B8,#D9B969); box-shadow: 0 6px 14px -10px rgba(122,95,30,.9);
+  border-radius:2px; border:1px solid var(--gold); color:#141B2D; background:#E9D597;
+  font-family:{DISPLAY}; font-weight:700; letter-spacing:2px; text-transform:uppercase; font-size:.74rem; box-shadow:none;
 }}
 .stButton button:hover, .stDownloadButton button:hover, .stFormSubmitButton button:hover {{
-  border-color:var(--gold-deep); color:#141B2D; background: linear-gradient(180deg,#FFF1C9,#CFAE5C);
+  border-color:var(--midnight); color:#F3E6C4; background:var(--midnight);
 }}
+.stButton button:hover *, .stDownloadButton button:hover *, .stFormSubmitButton button:hover * {{ color:#F3E6C4 !important; }}
 .stButton button:focus-visible, .stDownloadButton button:focus-visible {{ outline: 3px solid {SAPPHIRE}; outline-offset:2px; }}
-.stTabs [data-baseweb="tab-list"] {{ gap:4px; border-bottom:1px solid #E7DCC4; }}
-.stTabs [data-baseweb="tab"] {{ font-family:'Cormorant Garamond', serif; font-size:1.15rem; font-weight:600; color:#5E5649; padding: 8px 16px; }}
+.stTabs [data-baseweb="tab-list"] {{ gap:0; border-bottom:1px solid var(--rule); }}
+.stTabs [data-baseweb="tab"] {{ font-family:{DISPLAY}; font-size:.78rem; font-weight:600; letter-spacing:2.4px;
+  text-transform:uppercase; color:#6E6352; padding: 10px 20px; }}
+.stTabs [data-baseweb="tab"] p {{ font-family:{DISPLAY}; font-size:.78rem; letter-spacing:2.4px; }}
 .stTabs [aria-selected="true"] {{ color: var(--midnight) !important; }}
-.stTabs [data-baseweb="tab-highlight"] {{ background: var(--gold) !important; height:3px; }}
-div[data-testid="stExpander"] {{ border:1px solid #E7DCC4; border-radius:12px; background:#FFFDF8; }}
-div[data-testid="stDataFrame"] {{ border:1px solid #E7DCC4; border-radius:12px; overflow:hidden; }}
+.stTabs [data-baseweb="tab-highlight"] {{ background: var(--gold) !important; height:2px; }}
+div[data-testid="stExpander"] {{ border:1px solid var(--rule); border-radius:0; background:var(--paper); }}
+div[data-testid="stDataFrame"] {{ border:1px solid var(--rule); border-radius:0; }}
+[data-baseweb="input"], [data-baseweb="select"] > div, textarea {{ border-radius:2px !important; }}
 </style>
 """
