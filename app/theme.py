@@ -1,29 +1,55 @@
-"""Visual identity: ivory, champagne gold and midnight, with gemstone status colours.
+"""Visual identity: two palettes (Ivory & Gold / Onyx & Champagne) with gemstone status colours.
 
 Ruby = FLAG, Topaz = NEEDS_REVIEW, Emerald = WITHIN_TOLERANCE, Sapphire = informational.
-All colours are paired with text labels (never colour alone) and meet WCAG AA contrast on ivory.
+Colours are always paired with text labels and were chosen for WCAG AA contrast on their own background.
+Styles live in style.css and only reference CSS variables, so a theme switch is a palette swap.
 """
 from __future__ import annotations
 
 import html
+from pathlib import Path
 
-GOLD = "#A8862F"
-GOLD_DEEP = "#7A5F1E"
-MIDNIGHT = "#141B2D"
-IVORY = "#FBF8F2"
-RUBY = "#9B1B30"
-TOPAZ = "#8A5A00"
-EMERALD = "#1F6B4F"
-SAPPHIRE = "#1F4E8C"
+from streamlit import config as st_config
 
-STATUS = {
-    "FLAG": ("Ruby", RUBY, "#FBEAEC", "Flagged"),
-    "NEEDS_REVIEW": ("Topaz", TOPAZ, "#FDF3DF", "Needs review"),
-    "WITHIN_TOLERANCE": ("Emerald", EMERALD, "#E6F3EC", "Within tolerance"),
+# Gem accents used by Python-rendered HTML (resolve per theme through CSS variables)
+GOLD, RUBY, TOPAZ, EMERALD, SAPPHIRE = "var(--gold)", "var(--ruby)", "var(--topaz)", "var(--emerald)", "var(--sapphire)"
+
+PALETTES = {
+    "light": {  # Ivory & Gold
+        "bg": "#F6F1E7", "paper": "#FFFCF6", "raised": "#FBF6EC", "ink": "#1E1A16", "muted": "#6B604F",
+        "rule": "#E4D8BF", "gold": "#A8862F", "gold-deep": "#7A5F1E", "gold-soft": "#F1E4BE",
+        "hero": "linear-gradient(125deg,#121829 0%,#1C2540 60%,#2A2740 100%)", "hero-ink": "#F3E6C4", "hero-muted": "#BDB295",
+        "side": "linear-gradient(180deg,#121829 0%,#1A2236 100%)", "side-ink": "#E6DCC2", "side-field": "#1F2840",
+        "ruby": "#9B1B30", "ruby-bg": "#FBEAEC", "topaz": "#8A5A00", "topaz-bg": "#FCF1DC",
+        "emerald": "#1F6B4F", "emerald-bg": "#E4F2EA", "sapphire": "#1F4E8C", "sapphire-bg": "#E8EEF8",
+        "shadow": "0 14px 32px -24px rgba(60,45,15,.45)", "btn-ink": "#141B2D",
+        "btn": "linear-gradient(180deg,#F3E2AE,#D6B460)",
+    },
+    "dark": {  # Onyx & Champagne
+        "bg": "#0D111B", "paper": "#151B28", "raised": "#1A2132", "ink": "#EEE5D0", "muted": "#A89D86",
+        "rule": "#2A3247", "gold": "#D4B35E", "gold-deep": "#E6CB83", "gold-soft": "#2B2618",
+        "hero": "linear-gradient(125deg,#161D2E 0%,#1D2338 55%,#2A2436 100%)", "hero-ink": "#F3E6C4", "hero-muted": "#B7AC90",
+        "side": "linear-gradient(180deg,#0A0E17 0%,#111727 100%)", "side-ink": "#E2D8BF", "side-field": "#182033",
+        "ruby": "#F07D8E", "ruby-bg": "rgba(240,125,142,.12)", "topaz": "#EDB65A", "topaz-bg": "rgba(237,182,90,.12)",
+        "emerald": "#5CCB9B", "emerald-bg": "rgba(92,203,155,.12)", "sapphire": "#86AEEB", "sapphire-bg": "rgba(134,174,235,.12)",
+        "shadow": "0 16px 36px -22px rgba(0,0,0,.8)", "btn-ink": "#141B2D",
+        "btn": "linear-gradient(180deg,#EAD9A2,#C9A54E)",
+    },
 }
-PRIORITY = {"P1": RUBY, "P2": TOPAZ, "P3": SAPPHIRE}
-DECISION = {"pending": ("#5E5649", "#EFEAE0"), "approved": (EMERALD, "#E6F3EC"), "rejected": (RUBY, "#FBEAEC"),
-            "escalated": (SAPPHIRE, "#E7EEF8"), "needs_info": (TOPAZ, "#FDF3DF")}
+
+# Native Streamlit widgets (dataframes, inputs, selects) follow the Streamlit theme, so mirror the palette there.
+NATIVE = {
+    "light": {"base": "light", "primaryColor": "#A8862F", "backgroundColor": "#F6F1E7", "secondaryBackgroundColor": "#F0E8D8",
+              "textColor": "#1E1A16", "borderColor": "#E4D8BF", "dataframeHeaderBackgroundColor": "#F3EBDA"},
+    "dark": {"base": "dark", "primaryColor": "#D4B35E", "backgroundColor": "#0D111B", "secondaryBackgroundColor": "#1A2132",
+             "textColor": "#EEE5D0", "borderColor": "#2A3247", "dataframeHeaderBackgroundColor": "#1A2132"},
+}
+
+STATUS = {"FLAG": ("Ruby", "flag", "Flagged"), "NEEDS_REVIEW": ("Topaz", "review", "Needs review"),
+          "WITHIN_TOLERANCE": ("Emerald", "ok", "Within tolerance")}
+PRIORITY = {"P1": "flag", "P2": "review", "P3": "info"}
+DECISION = {"pending": "neutral", "approved": "ok", "rejected": "flag", "escalated": "info", "needs_info": "review"}
+SEVERITY = {"critical": "flag", "high": "flag", "medium": "review", "low": "info", "info": "neutral"}
 
 DIAMOND_SVG = """
 <svg width="{s}" height="{s}" viewBox="0 0 64 64" role="img" aria-label="diamond" xmlns="http://www.w3.org/2000/svg">
@@ -37,6 +63,8 @@ DIAMOND_SVG = """
 </svg>
 """
 
+_STYLE = Path(__file__).with_name("style.css")
+
 
 def diamond(size: int = 40, uid: str = "a") -> str:
     return DIAMOND_SVG.format(s=size, uid=uid)
@@ -47,158 +75,40 @@ def esc(v: object) -> str:
     return html.escape("" if v is None else str(v))
 
 
+def css(mode: str) -> str:
+    pal = PALETTES[mode]
+    root = ":root{" + "".join(f"--{k}:{v};" for k, v in pal.items()) + f"color-scheme:{mode};}}"
+    return f"<style>{_STYLE.read_text(encoding='utf-8')}\n{root}</style>"  # @import must stay first
+
+
+def apply_native_theme(mode: str) -> None:
+    """Point Streamlit's own theme at the palette (process-wide; fine for a local single-user tool)."""
+    for k, v in NATIVE[mode].items():
+        st_config.set_option(f"theme.{k}", v)
+    st_config.set_option("theme.baseRadius", "0.75rem")
+    # The sidebar is a midnight "vitrine" in both modes
+    for k, v in {"backgroundColor": "#121829", "secondaryBackgroundColor": "#1F2840", "textColor": "#E6DCC2",
+                 "borderColor": "#3A3A3A", "primaryColor": "#D4B35E"}.items():
+        st_config.set_option(f"theme.sidebar.{k}", v)
+
+
+def native_theme_mode() -> str:
+    return "dark" if st_config.get_option("theme.base") == "dark" else "light"
+
+
 def status_chip(status: str) -> str:
-    gem, fg, bg, label = STATUS.get(status, ("", "#333", "#eee", status))
-    return (f'<span class="chip" style="color:{fg};background:{bg};border-color:{fg}33">'
-            f'<span class="gem" style="background:{fg}"></span>{esc(label)}<span class="gemname">· {gem}</span></span>')
+    gem, cls, label = STATUS.get(status, ("", "neutral", status))
+    return f'<span class="chip t-{cls}"><span class="gem"></span>{esc(label)}<span class="gemname">· {gem}</span></span>'
 
 
 def priority_chip(p: str) -> str:
-    c = PRIORITY.get(p, "#555")
-    return f'<span class="chip pri" style="color:#fff;background:{c};border-color:{c}">{esc(p)}</span>'
+    return f'<span class="chip solid t-{PRIORITY.get(p, "neutral")}">{esc(p)}</span>'
 
 
 def decision_chip(d: str, stale: bool = False) -> str:
-    fg, bg = DECISION.get(d, ("#333", "#eee"))
     label = d.replace("_", " ").title() + (" · stale" if stale else "")
-    return f'<span class="chip" style="color:{fg};background:{bg};border-color:{fg}33">{esc(label)}</span>'
+    return f'<span class="chip t-{DECISION.get(d, "neutral")}">{esc(label)}</span>'
 
 
 def code_chip(code: str, severity: str = "info") -> str:
-    col = {"critical": RUBY, "high": RUBY, "medium": TOPAZ, "low": SAPPHIRE, "info": "#5E5649"}.get(severity, "#5E5649")
-    return f'<span class="code" style="color:{col};border-color:{col}55">{esc(code)}</span>'
-
-
-# Typography (all sans, classic maison style):
-#   Josefin Sans – Art-Deco display caps (wordmark, labels, tabs)
-#   Jost         – geometric, Futura-like headings and figures
-#   Mulish       – quiet, highly legible body text
-DISPLAY = "'Josefin Sans', 'Futura', 'Century Gothic', sans-serif"
-HEAD = "'Jost', 'Futura', 'Avenir Next', sans-serif"
-BODY = "'Mulish', 'Avenir', 'Segoe UI', system-ui, sans-serif"
-
-CSS = f"""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Jost:wght@400;500;600&family=Mulish:wght@400;500;600;700&display=swap');
-
-:root {{ --gold:{GOLD}; --gold-deep:{GOLD_DEEP}; --midnight:{MIDNIGHT}; --ivory:{IVORY}; --rule:#D9CCAE; --paper:#FFFDF8; }}
-html, body, [class*="css"], .stMarkdown, .stText, p, li, label, input, textarea, .stSelectbox, .stDataFrame {{
-  font-family: {BODY};
-}}
-h1, h2, h3, h4 {{ font-family: {HEAD} !important; font-weight:500 !important; color: var(--midnight); letter-spacing:.2px; }}
-.stApp {{ background: var(--ivory); }}
-
-/* ---------- full-width canvas: remove Streamlit's side gutters ---------- */
-.block-container, [data-testid="stMainBlockContainer"] {{
-  max-width: 100% !important; padding: 0.9rem 1.4rem 2rem 1.4rem !important;
-}}
-header[data-testid="stHeader"] {{ background: transparent; height: 0; }}
-
-/* ---------- masthead: midnight band framed by a double gold rule ---------- */
-.hero {{
-  position: relative; padding: 22px 28px; margin: 0 0 0 0; background: var(--midnight);
-  border-top: 3px double var(--gold); border-bottom: 3px double var(--gold);
-}}
-.hero:before, .hero:after {{
-  content:""; position:absolute; width:18px; height:18px; border: 1px solid var(--gold);
-}}
-.hero:before {{ top:8px; left:8px; border-right:0; border-bottom:0; }}
-.hero:after {{ bottom:8px; right:8px; border-left:0; border-top:0; }}
-.hero .row {{ display:flex; align-items:center; gap:20px; }}
-.hero .eyebrow {{ font-family:{DISPLAY}; font-size:.7rem; letter-spacing:5px; text-transform:uppercase; color:var(--gold); }}
-.hero h1 {{ font-family:{DISPLAY} !important; color:#F3E6C4 !important; margin:4px 0 2px; font-size:1.75rem; white-space:nowrap;
-  font-weight:600 !important; letter-spacing:4px; text-transform:uppercase; line-height:1.15; padding:0; }}
-.hero .tag {{ color:#C9BEA2; font-size:.9rem; letter-spacing:.3px; }}
-.hero .meta {{ margin-left:auto; text-align:right; color:#A99E84; font-size:.74rem; line-height:1.8;
-  border-left:1px solid rgba(168,134,47,.5); padding-left:20px; text-transform:uppercase; letter-spacing:1.5px; }}
-.hero .meta b {{ color:#F3E6C4; font-weight:600; font-family:{HEAD}; letter-spacing:.5px; text-transform:none; font-size:.82rem; }}
-.wordmark {{ font-family:{DISPLAY}; font-size:1.25rem; font-weight:700; letter-spacing:6px; color:#F3E6C4; line-height:1; }}
-.goldline {{ height:0; border:0; border-top:1px solid var(--gold); margin: 6px 0 14px; }}
-
-/* ---------- KPI ledger: one ruled strip, no floating cards ---------- */
-.kpis {{ display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin: 0 0 18px;
-  background: var(--paper); border-bottom:1px solid var(--rule); }}
-.kpi {{ display:flex; flex-direction:column; padding:14px 18px 12px; border-right:1px solid var(--rule); position:relative; }}
-.kpi:last-child {{ border-right:0; }}
-.kpi:before {{ content:""; position:absolute; top:16px; left:18px; width:7px; height:7px; transform:rotate(45deg); background:var(--accent, var(--gold)); }}
-.kpi .label {{ font-family:{DISPLAY}; font-size:.64rem; text-transform:uppercase; letter-spacing:1.6px; color:#6E6352; padding-left:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }}
-.kpi .value {{ font-family:{HEAD}; font-size:2rem; font-weight:400; color: var(--midnight); line-height:1.2;
-  font-variant-numeric: tabular-nums lining-nums; margin-top:4px; }}
-.kpi .sub {{ font-size:.74rem; color:#7B705E; }}
-
-/* ---------- chips: lozenge tags with a cut-gem marker ---------- */
-.chip {{ display:inline-flex; align-items:center; gap:7px; padding:3px 10px; border-radius:2px; border:1px solid;
-  font-family:{DISPLAY}; font-size:.7rem; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; white-space:nowrap; }}
-.chip .gem {{ width:8px; height:8px; transform: rotate(45deg); display:inline-block; }}
-.chip .gemname {{ font-weight:400; opacity:.7; }}
-.chip.pri {{ padding:3px 8px; letter-spacing:1.5px; }}
-.code {{ display:inline-block; font: 600 .68rem {HEAD}; letter-spacing:.6px; padding:2px 7px; margin:2px 4px 2px 0;
-  border-radius:0; border:1px solid; background:var(--paper); }}
-
-/* ---------- panels: ruled paper sheets ---------- */
-.panel {{ background:var(--paper); border:1px solid var(--rule); border-top:2px solid var(--midnight); padding:16px 20px; margin-bottom:14px; }}
-.panel h3 {{ margin: 0 0 10px; font-family:{DISPLAY} !important; font-size:.82rem; font-weight:700 !important;
-  letter-spacing:3px; text-transform:uppercase; color:var(--gold-deep); padding-bottom:8px; border-bottom:1px solid var(--rule); }}
-.panel .muted {{ color:#6E6352; font-size:.85rem; }}
-.facet {{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dotted var(--rule); font-size:.88rem; }}
-.facet:last-child {{ border-bottom:0; }}
-.facet span:first-child {{ color:#6E6352; }}
-.facet span:last-child {{ font-weight:600; color:var(--midnight); text-align:right; }}
-.amount {{ font-family:{HEAD}; font-size:1.85rem; font-weight:400; font-variant-numeric: tabular-nums; }}
-.var-pos {{ color:{RUBY}; }} .var-neg {{ color:{SAPPHIRE}; }} .var-zero {{ color:{EMERALD}; }}
-
-.calc {{ width:100%; border-collapse:collapse; font-size:.87rem; }}
-.calc td {{ padding:6px 4px; border-bottom:1px dotted var(--rule); }}
-.calc td:last-child {{ text-align:right; font-family:{HEAD}; font-variant-numeric: tabular-nums; font-weight:500; }}
-.calc tr.total td {{ border-top:3px double var(--gold); border-bottom:0; font-size:1rem; font-weight:600; }}
-.calc .f {{ color:#7B705E; font-size:.76rem; }}
-
-.ev {{ border-left:2px solid var(--gold); background:#F8F2E3; padding:8px 12px; margin:8px 0; }}
-.ev .src {{ font-family:{DISPLAY}; font-size:.66rem; letter-spacing:1.8px; color:var(--gold-deep); font-weight:700; text-transform:uppercase; }}
-.ev .q {{ font-size:.85rem; color:#2E2820; margin-top:3px; word-break: break-word; }}
-.cite {{ border-left-color:{SAPPHIRE}; background:#EFF3F9; }}
-.cite .src {{ color:{SAPPHIRE}; }}
-.warn {{ border-left-color:{RUBY}; background:#FAECEE; }}
-.warn .src {{ color:{RUBY}; }}
-
-.explain {{ background:var(--paper); border:1px solid var(--rule); border-left:3px double var(--gold); padding:12px 16px; font-size:.92rem; }}
-.explain .who {{ font-family:{DISPLAY}; font-size:.64rem; letter-spacing:2.2px; text-transform:uppercase; color:var(--gold-deep); margin-bottom:4px; }}
-
-.ornament {{ text-align:center; color:var(--gold); letter-spacing:12px; font-size:.7rem; margin: 8px 0 4px; }}
-.footer {{ text-align:center; color:#8B806C; font-family:{DISPLAY}; font-size:.68rem; letter-spacing:2px; text-transform:uppercase; margin-top:28px; }}
-
-/* ---------- sidebar: midnight vitrine ---------- */
-section[data-testid="stSidebar"] {{ background: var(--midnight); border-right:1px solid var(--gold); }}
-section[data-testid="stSidebar"] * {{ color:#E2D8BF !important; }}
-section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {{
-  font-family:{DISPLAY} !important; color:#F3E6C4 !important; letter-spacing:3px; text-transform:uppercase; font-size:.95rem !important; }}
-section[data-testid="stSidebar"] [data-baseweb="select"] > div,
-section[data-testid="stSidebar"] input {{ background:#1D2539 !important; border-color:#4A4636 !important; border-radius:2px !important; }}
-section[data-testid="stSidebar"] .stButton button {{ width:100%; }}
-section[data-testid="stSidebar"] .stButton button, section[data-testid="stSidebar"] .stButton button * {{ color:#141B2D !important; }}
-section[data-testid="stSidebar"] div[data-testid="stExpander"],
-section[data-testid="stSidebar"] div[data-testid="stExpander"] summary {{ background:#1A2134 !important; border-color:#4A4636 !important; }}
-section[data-testid="stSidebar"] [data-testid="stNumberInput"] button {{ background:#262F48 !important; }}
-section[data-testid="stSidebar"] [data-testid="stAlert"] * {{ color:#141B2D !important; }}
-
-/* ---------- buttons, tabs, tables ---------- */
-.stButton button, .stDownloadButton button, .stFormSubmitButton button {{
-  border-radius:2px; border:1px solid var(--gold); color:#141B2D; background:#E9D597;
-  font-family:{DISPLAY}; font-weight:700; letter-spacing:2px; text-transform:uppercase; font-size:.74rem; box-shadow:none;
-}}
-.stButton button:hover, .stDownloadButton button:hover, .stFormSubmitButton button:hover {{
-  border-color:var(--midnight); color:#F3E6C4; background:var(--midnight);
-}}
-.stButton button:hover *, .stDownloadButton button:hover *, .stFormSubmitButton button:hover * {{ color:#F3E6C4 !important; }}
-.stButton button:focus-visible, .stDownloadButton button:focus-visible {{ outline: 3px solid {SAPPHIRE}; outline-offset:2px; }}
-.stTabs [data-baseweb="tab-list"] {{ gap:0; border-bottom:1px solid var(--rule); }}
-.stTabs [data-baseweb="tab"] {{ font-family:{DISPLAY}; font-size:.78rem; font-weight:600; letter-spacing:2.4px;
-  text-transform:uppercase; color:#6E6352; padding: 10px 20px; }}
-.stTabs [data-baseweb="tab"] p {{ font-family:{DISPLAY}; font-size:.78rem; letter-spacing:2.4px; }}
-.stTabs [aria-selected="true"] {{ color: var(--midnight) !important; }}
-.stTabs [data-baseweb="tab-highlight"] {{ background: var(--gold) !important; height:2px; }}
-div[data-testid="stExpander"] {{ border:1px solid var(--rule); border-radius:0; background:var(--paper); }}
-div[data-testid="stDataFrame"] {{ border:1px solid var(--rule); border-radius:0; }}
-[data-baseweb="input"], [data-baseweb="select"] > div, textarea {{ border-radius:2px !important; }}
-</style>
-"""
+    return f'<span class="code t-{SEVERITY.get(severity, "neutral")}">{esc(code)}</span>'

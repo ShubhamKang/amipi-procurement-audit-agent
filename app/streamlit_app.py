@@ -21,10 +21,16 @@ from audit_agent.pipeline import run_audit  # noqa: E402
 from audit_agent.store import DECISIONS, ReviewError, ReviewStore  # noqa: E402
 
 import views as V  # noqa: E402
-from theme import CSS, EMERALD, RUBY, SAPPHIRE, TOPAZ, diamond, esc  # noqa: E402
+from theme import EMERALD, RUBY, SAPPHIRE, TOPAZ, apply_native_theme, css, native_theme_mode, diamond, esc  # noqa: E402
 
 st.set_page_config(page_title="AMIPI · Quotation Audit Atelier", page_icon="💎", layout="wide")
-st.markdown(CSS, unsafe_allow_html=True)
+
+# ----------------------------------------------------------------------------- theme (light / dark)
+MODE = "dark" if st.session_state.get("dark_mode") else "light"
+if native_theme_mode() != MODE:
+    apply_native_theme(MODE)  # Streamlit sends its theme at the start of a run, so re-run once after switching
+    st.rerun()
+st.markdown(css(MODE), unsafe_allow_html=True)
 
 
 # ----------------------------------------------------------------------------- state
@@ -54,11 +60,10 @@ def execute(data_dir: Path, provider: str, overrides: dict, explain: bool):
 
 # ----------------------------------------------------------------------------- sidebar
 with st.sidebar:
-    st.markdown(f'<div style="display:flex;gap:10px;align-items:center">{diamond(34, "s")}'
-                '<div><div class="wordmark">AMIPI</div>'
-                '<div style="font-size:.72rem;letter-spacing:2px">AUDIT ATELIER</div></div></div>', unsafe_allow_html=True)
-    st.markdown("---")
-    st.markdown("### Audit run")
+    st.markdown(f'<div class="brand">{diamond(46, "s")}<div class="wordmark">AMIPI</div><div class="rule"></div>'
+                '<div class="sub">Audit Atelier</div></div>', unsafe_allow_html=True)
+    st.toggle("Dark mode", key="dark_mode", help="Onyx & Champagne (dark) · Ivory & Gold (light)")
+    st.markdown('<div class="side-label">Audit run</div>', unsafe_allow_html=True)
     llm_env = load_llm_settings()
     options = ["gemini", "mock", "none"]
     provider = st.selectbox("AI provider", options, index=options.index(llm_env.provider) if llm_env.provider in options else 1,
@@ -71,6 +76,7 @@ with st.sidebar:
     if source == "Upload files":
         uploads = st.file_uploader("XLSX / CSV / PDF", type=["xlsx", "csv", "pdf"], accept_multiple_files=True)
 
+    st.markdown('<div class="side-label">Rules</div>', unsafe_allow_html=True)
     with st.expander("Live rule changes"):
         base = load_settings()
         tol = st.number_input("Tolerance (USD)", value=float(base.tolerance), min_value=0.0, step=0.01, format="%.2f")
@@ -107,8 +113,8 @@ st.markdown(f"""
   {diamond(50, "h")}
   <div><div class="eyebrow">AMIPI · Procurement Audit · Fine Jewellery</div><h1>Quotation Audit Atelier</h1>
   <div class="tag">Every carat, gram and setting — reconciled against policy, with evidence you can trace.</div></div>
-  <div class="meta">Run <b>{esc(run.run_id)}</b><br>AI provider <b>{esc(run.provider)}</b><br>
-  Rules <b>{esc(run.config_hash)}</b> · tolerance <b>${run.settings.tolerance}</b> · {esc(run.settings.rounding_mode)}</div>
+  <div class="meta"><span>Run</span><b>{esc(run.run_id)}</b><span>AI provider</span><b>{esc(run.provider)}</b>
+  <span>Rules</span><b>{esc(run.config_hash)}</b><span>Tolerance</span><b>${run.settings.tolerance} · {esc(run.settings.rounding_mode)}</b></div>
 </div></div>""", unsafe_allow_html=True)
 
 pending = sum(f.human_review.decision == "pending" for f in run.findings)
@@ -116,13 +122,13 @@ st.markdown(V.kpi_row([
     V.kpi("Quotations", str(M["quotations"]), f"from {M['source_records']} records, de-duplicated"),
     V.kpi("Flagged", str(M["flag"]), "ruby · above tolerance", RUBY),
     V.kpi("Needs review", str(M["needs_review"]), "topaz · insufficient evidence", TOPAZ),
-    V.kpi("Within tolerance", str(M["within_tolerance"]), "emerald · awaiting sign-off", EMERALD),
+    V.kpi("In tolerance", str(M["within_tolerance"]), "emerald · awaiting sign-off", EMERALD),
     V.kpi("Net overquote", f"${M['overquote_usd']:,.2f}", f"underquotes −${abs(M['underquote_usd']):,.2f}", RUBY),
     V.kpi("Pending review", str(pending), f"auto-approved: {M['auto_approved']}", SAPPHIRE),
 ]), unsafe_allow_html=True)
 
 if M["injections_detected"]:
-    st.markdown(f'<div class="ev warn"><div class="src">Security</div><div class="q">{M["injections_detected"]} vendor note(s) contained embedded instructions. '
+    st.markdown(f'<div class="ev warn alert"><div class="src">Security</div><div class="q">{M["injections_detected"]} vendor note(s) contained embedded instructions. '
                 'They were quarantined, never sent to the model, and had no effect on rates, totals or status.</div></div>', unsafe_allow_html=True)
 
 tab_f, tab_r, tab_n, tab_s, tab_x = st.tabs(["Findings", "Review ledger", "Vendor notes & security", "Sources & AI log", "Export"])
@@ -158,7 +164,7 @@ with tab_f:
             "description": st.column_config.TextColumn("Item", width="medium"),
             "quoted_total_usd": st.column_config.NumberColumn("Quoted", format="$%.2f"),
             "expected_total_usd": st.column_config.NumberColumn("Expected", format="$%.2f"),
-            "variance_usd": st.column_config.NumberColumn("Variance", format="$%+.2f"),
+            "variance_usd": st.column_config.NumberColumn("Variance $", format="%+.2f"),
             "matched_rate_id": "Rate", "issue_codes": st.column_config.TextColumn("Issues", width="medium"),
             "review_decision": "Review",
         })
@@ -235,20 +241,20 @@ with tab_n:
 with tab_s:
     a, b = st.columns(2)
     with a:
-        st.markdown("#### Ingestion report")
+        st.markdown('<div class="section-title">Ingestion report</div>', unsafe_allow_html=True)
         if run.ingestion_issues:
             st.dataframe(pd.DataFrame([i.model_dump(mode="json") for i in run.ingestion_issues]), hide_index=True, width="stretch")
         else:
             st.success("All documents ingested without errors.")
-        st.markdown("#### Files (SHA-256 prefix)")
+        st.markdown('<div class="section-title">Files (SHA-256 prefix)</div>', unsafe_allow_html=True)
         st.dataframe(pd.DataFrame([{"file": k, "sha256": v} for k, v in run.file_hashes.items()]), hide_index=True, width="stretch")
         if run.unquoted_po_lines:
             st.warning("PO lines without a trustworthy quotation: " + ", ".join(run.unquoted_po_lines))
     with b:
-        st.markdown("#### AI activity")
+        st.markdown('<div class="section-title">AI activity</div>', unsafe_allow_html=True)
         if run.ai_events:
             st.dataframe(pd.DataFrame([e.__dict__ for e in run.ai_events]), hide_index=True, width="stretch")
-        st.markdown("#### Rate cards")
+        st.markdown('<div class="section-title">Rate cards</div>', unsafe_allow_html=True)
         st.dataframe(pd.DataFrame([{k: str(v) for k, v in r.model_dump(exclude={"evidence"}).items()} for r in run.rates]),
                      hide_index=True, width="stretch")
 

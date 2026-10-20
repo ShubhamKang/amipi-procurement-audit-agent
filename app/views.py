@@ -20,7 +20,7 @@ def var_class(v: float | None) -> str:
     return "var-pos" if v > 0.0 else "var-neg" if v < 0.0 else "var-zero"
 
 
-def kpi(label: str, value: str, sub: str = "", accent: str = "#A8862F") -> str:
+def kpi(label: str, value: str, sub: str = "", accent: str = "var(--gold)") -> str:
     return (f'<div class="kpi" style="--accent:{accent}"><div class="label">{esc(label)}</div>'
             f'<div class="value">{esc(value)}</div><div class="sub">{esc(sub)}</div></div>')
 
@@ -38,14 +38,14 @@ def header_panel(f: Finding) -> str:
     return f"""
 <div class="panel">
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <h3 style="margin:0">{esc(f.quote_id)} · {esc(f.vendor)}</h3>
+    <div class="title">{esc(f.quote_id)} · {esc(f.vendor)}</div>
     {status_chip(f.status)} {priority_chip(f.priority)} {decision_chip(f.human_review.decision, f.human_review.stale)}
   </div>
-  <div class="muted" style="margin:6px 0 12px">{esc(f.description)}</div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
-    <div><div class="muted">Quoted total</div><div class="amount">{money(f.quoted_total_usd)}</div></div>
-    <div><div class="muted">Policy-expected total</div><div class="amount">{money(f.expected_total_usd)}</div></div>
-    <div><div class="muted">Variance</div><div class="amount {var_class(v)}">{signed(v)}
+  <div class="muted" style="margin-top:6px">{esc(f.description)}</div>
+  <div class="figures">
+    <div class="figure"><div class="muted">Quoted total</div><div class="amount">{money(f.quoted_total_usd)}</div></div>
+    <div class="figure"><div class="muted">Policy-expected total</div><div class="amount">{money(f.expected_total_usd)}</div></div>
+    <div class="figure"><div class="muted">Variance</div><div class="amount {var_class(v)}">{signed(v)}
       <span class="muted" style="font-size:.85rem">{'' if f.variance_pct is None else f'({f.variance_pct:+.2f}%)'}</span></div></div>
   </div>
 </div>"""
