@@ -15,15 +15,15 @@ from streamlit import config as st_config
 GOLD, RUBY, TOPAZ, EMERALD, SAPPHIRE = "var(--gold)", "var(--ruby)", "var(--topaz)", "var(--emerald)", "var(--sapphire)"
 
 PALETTES = {
-    "light": {  # Ivory & Gold
-        "bg": "#F6F1E7", "paper": "#FFFCF6", "raised": "#FBF6EC", "ink": "#1E1A16", "muted": "#6B604F",
-        "rule": "#E4D8BF", "gold": "#A8862F", "gold-deep": "#7A5F1E", "gold-soft": "#F1E4BE",
-        "hero": "linear-gradient(125deg,#121829 0%,#1C2540 60%,#2A2740 100%)", "hero-ink": "#F3E6C4", "hero-muted": "#BDB295",
+    "light": {  # Ivory & Gold — refined boutique light
+        "bg": "#F3EFE9", "paper": "#FFFFFF", "raised": "#FAF6EF", "ink": "#211C17", "muted": "#776B5B",
+        "rule": "#EADFCB", "gold": "#9C7C2B", "gold-deep": "#6E521A", "gold-soft": "#F7EDD4",
+        "hero": "linear-gradient(125deg,#141A2C 0%,#1E274A 58%,#30294A 100%)", "hero-ink": "#F6EAC8", "hero-muted": "#C4B896",
         "side": "linear-gradient(180deg,#121829 0%,#1A2236 100%)", "side-ink": "#E6DCC2", "side-field": "#1F2840",
-        "ruby": "#9B1B30", "ruby-bg": "#FBEAEC", "topaz": "#8A5A00", "topaz-bg": "#FCF1DC",
-        "emerald": "#1F6B4F", "emerald-bg": "#E4F2EA", "sapphire": "#1F4E8C", "sapphire-bg": "#E8EEF8",
-        "shadow": "0 14px 32px -24px rgba(60,45,15,.45)", "btn-ink": "#141B2D",
-        "btn": "linear-gradient(180deg,#F3E2AE,#D6B460)",
+        "ruby": "#A51E38", "ruby-bg": "#FBEBED", "topaz": "#8A5A00", "topaz-bg": "#FBF0D9",
+        "emerald": "#1C6B4C", "emerald-bg": "#E4F1E9", "sapphire": "#1E4F93", "sapphire-bg": "#E9EFFA",
+        "shadow": "0 18px 40px -28px rgba(60,45,15,.38)", "btn-ink": "#141B2D",
+        "btn": "linear-gradient(180deg,#F4E4B0,#D4B055)", "btn-border": "#8A6A1E",
     },
     "dark": {  # Onyx & Champagne
         "bg": "#0D111B", "paper": "#151B28", "raised": "#1A2132", "ink": "#EEE5D0", "muted": "#A89D86",
@@ -33,14 +33,14 @@ PALETTES = {
         "ruby": "#F07D8E", "ruby-bg": "rgba(240,125,142,.12)", "topaz": "#EDB65A", "topaz-bg": "rgba(237,182,90,.12)",
         "emerald": "#5CCB9B", "emerald-bg": "rgba(92,203,155,.12)", "sapphire": "#86AEEB", "sapphire-bg": "rgba(134,174,235,.12)",
         "shadow": "0 16px 36px -22px rgba(0,0,0,.8)", "btn-ink": "#141B2D",
-        "btn": "linear-gradient(180deg,#EAD9A2,#C9A54E)",
+        "btn": "linear-gradient(180deg,#EAD9A2,#C9A54E)", "btn-border": "#F0D98F",
     },
 }
 
 # Native Streamlit widgets (dataframes, inputs, selects) follow the Streamlit theme, so mirror the palette there.
 NATIVE = {
-    "light": {"base": "light", "primaryColor": "#A8862F", "backgroundColor": "#F6F1E7", "secondaryBackgroundColor": "#F0E8D8",
-              "textColor": "#1E1A16", "borderColor": "#E4D8BF", "dataframeHeaderBackgroundColor": "#F3EBDA"},
+    "light": {"base": "light", "primaryColor": "#9C7C2B", "backgroundColor": "#F3EFE9", "secondaryBackgroundColor": "#FAF6EF",
+              "textColor": "#211C17", "borderColor": "#EADFCB", "dataframeHeaderBackgroundColor": "#F3EBD9"},
     "dark": {"base": "dark", "primaryColor": "#D4B35E", "backgroundColor": "#0D111B", "secondaryBackgroundColor": "#1A2132",
              "textColor": "#EEE5D0", "borderColor": "#2A3247", "dataframeHeaderBackgroundColor": "#1A2132"},
 }

@@ -4,6 +4,8 @@ Run:  streamlit run app/streamlit_app.py
 """
 from __future__ import annotations
 
+import hmac
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -15,15 +17,54 @@ APP_DIR = Path(__file__).resolve().parent
 ROOT = APP_DIR.parent
 sys.path[:0] = [str(APP_DIR), str(ROOT / "src")]
 
-from audit_agent.config import default_data_dir, default_db_path, load_llm_settings, load_settings  # noqa: E402
+from audit_agent.config import ROOT, default_data_dir, default_db_path, load_llm_settings, load_settings  # noqa: E402
 from audit_agent.export import findings_frame, to_csv, to_json, to_xlsx  # noqa: E402
 from audit_agent.pipeline import run_audit  # noqa: E402
 from audit_agent.store import DECISIONS, ReviewError, ReviewStore  # noqa: E402
+
+from dotenv import load_dotenv  # noqa: E402
+load_dotenv(ROOT / ".env", override=False)  # make APP_PASSWORD etc. available
 
 import views as V  # noqa: E402
 from theme import EMERALD, RUBY, SAPPHIRE, TOPAZ, apply_native_theme, css, native_theme_mode, diamond, esc  # noqa: E402
 
 st.set_page_config(page_title="AMIPI · Quotation Audit Atelier", page_icon="💎", layout="wide")
+
+
+# ----------------------------------------------------------------------------- optional authentication
+def _check_auth() -> bool:
+    """Optional password gate. Disabled when APP_PASSWORD is unset (local/dev).
+
+    Set APP_PASSWORD in the environment (or Streamlit secrets) to require a password before the
+    audit UI is shown. Reviewer names remain self-declared; this only gates access to the tool.
+    """
+    expected = os.getenv("APP_PASSWORD")
+    if not expected:
+        try:
+            expected = st.secrets.get("APP_PASSWORD")  # type: ignore[attr-defined]
+        except Exception:
+            expected = None
+    if not expected:
+        return True  # no password configured -> open (run locally or behind an authenticated proxy)
+    if st.session_state.get("_authed"):
+        return True
+    st.markdown(css("light"), unsafe_allow_html=True)
+    st.markdown('<div class="hero"><div class="row"><div><div class="eyebrow">AMIPI · Procurement Audit</div>'
+                '<h1>Quotation Audit Atelier</h1><div class="tag">Please sign in to continue.</div></div></div></div>',
+                unsafe_allow_html=True)
+    with st.form("login"):
+        pw = st.text_input("Password", type="password")
+        if st.form_submit_button("Enter"):
+            if hmac.compare_digest(pw, str(expected)):
+                st.session_state["_authed"] = True
+                st.rerun()
+            else:
+                st.error("Incorrect password.")
+    return False
+
+
+if not _check_auth():
+    st.stop()
 
 # ----------------------------------------------------------------------------- theme (light / dark)
 MODE = "dark" if st.session_state.get("dark_mode") else "light"
@@ -63,7 +104,7 @@ with st.sidebar:
     st.markdown(f'<div class="brand">{diamond(46, "s")}<div class="wordmark">AMIPI</div><div class="rule"></div>'
                 '<div class="sub">Audit Atelier</div></div>', unsafe_allow_html=True)
     st.toggle("Dark mode", key="dark_mode", help="Onyx & Champagne (dark) · Ivory & Gold (light)")
-    st.markdown('<div class="side-label">Audit run</div>', unsafe_allow_html=True)
+    st.markdown('<div class="side-label first">Audit run</div>', unsafe_allow_html=True)
     llm_env = load_llm_settings()
     options = ["gemini", "mock", "none"]
     provider = st.selectbox("AI provider", options, index=options.index(llm_env.provider) if llm_env.provider in options else 1,
@@ -113,7 +154,7 @@ st.markdown(f"""
   {diamond(50, "h")}
   <div><div class="eyebrow">AMIPI · Procurement Audit · Fine Jewellery</div><h1>Quotation Audit Atelier</h1>
   <div class="tag">Every carat, gram and setting — reconciled against policy, with evidence you can trace.</div></div>
-  <div class="meta"><span>Run</span><b>{esc(run.run_id)}</b><span>AI provider</span><b>{esc(run.provider)}</b>
+  <div class="meta"><div class="meta-cap">◈ Hallmark</div><span>Run</span><b>{esc(run.run_id)}</b><span>AI provider</span><b>{esc(run.provider)}</b>
   <span>Rules</span><b>{esc(run.config_hash)}</b><span>Tolerance</span><b>${run.settings.tolerance} · {esc(run.settings.rounding_mode)}</b></div>
 </div></div>""", unsafe_allow_html=True)
 
@@ -124,7 +165,7 @@ st.markdown(V.kpi_row([
     V.kpi("Needs review", str(M["needs_review"]), "topaz · insufficient evidence", TOPAZ),
     V.kpi("In tolerance", str(M["within_tolerance"]), "emerald · awaiting sign-off", EMERALD),
     V.kpi("Net overquote", f"${M['overquote_usd']:,.2f}", f"underquotes −${abs(M['underquote_usd']):,.2f}", RUBY),
-    V.kpi("Pending review", str(pending), f"auto-approved: {M['auto_approved']}", SAPPHIRE),
+    V.kpi("Pending review", str(pending), "none auto-approved by design", SAPPHIRE),
 ]), unsafe_allow_html=True)
 
 if M["injections_detected"]:
@@ -136,7 +177,7 @@ tab_f, tab_r, tab_n, tab_s, tab_x = st.tabs(["Findings", "Review ledger", "Vendo
 # ----------------------------------------------------------------------------- findings
 with tab_f:
     df = findings_frame(run.findings)
-    c1, c2, c3, c4 = st.columns([2.2, 1.4, 1.4, 1.4])
+    c1, c2, c3, c4 = st.columns([2, 1, 1, 1])
     q = c1.text_input("Search", placeholder="quote, vendor, item, issue code…", label_visibility="collapsed")
     st_f = c2.multiselect("Status", ["FLAG", "NEEDS_REVIEW", "WITHIN_TOLERANCE"], placeholder="All statuses")
     pr_f = c3.multiselect("Priority", ["P1", "P2", "P3"], placeholder="All priorities")
@@ -180,14 +221,16 @@ with tab_f:
         st.markdown(V.header_panel(f), unsafe_allow_html=True)
         st.markdown(V.explanation_html(f), unsafe_allow_html=True)
         st.write("")
+        # Full-width calculation (tallest element) avoids a lopsided two-column split.
+        st.markdown(V.calc_panel(f), unsafe_allow_html=True)
+        # Paired panels of comparable height sit side by side; each column fills its cell.
         a, b = st.columns([1, 1])
         with a:
-            st.markdown(V.calc_panel(f), unsafe_allow_html=True)
             st.markdown(V.facts_panel(f), unsafe_allow_html=True)
+            st.markdown(V.citations_html(f), unsafe_allow_html=True)
         with b:
             st.markdown(V.issues_html(f), unsafe_allow_html=True)
-            st.markdown(V.citations_html(f), unsafe_allow_html=True)
-        st.markdown(V.evidence_html(f), unsafe_allow_html=True)
+            st.markdown(V.evidence_html(f), unsafe_allow_html=True)
 
         # ---------------- review form
         st.markdown('<div class="panel"><h3>Reviewer decision</h3><div class="muted">Decisions are appended to a persistent ledger. '
