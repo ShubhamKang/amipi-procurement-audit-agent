@@ -1,0 +1,75 @@
+# Render Blueprint — AMIPI Procurement & Quotation Audit Agent
+# Native Python web service (Streamlit). Deploy via Render dashboard:
+#   New + -> Blueprint -> pick this repo -> Apply.
+#
+# FREE TIER NOTES (intentional for this deployment):
+#   * The service sleeps after ~15 min of inactivity; first request afterwards
+#     cold-starts (~30-50s). This is a free-tier limitation, same class of
+#     behaviour as Streamlit Community Cloud.
+#   * Free tier has NO persistent disk. The SQLite review ledger lives on an
+#     ephemeral filesystem and is WIPED on every redeploy/restart. Review
+#     decisions are NOT durable here.
+#
+# TO MAKE IT ALWAYS-ON + DURABLE LATER (one small change):
+#   1. change `plan: free` -> `plan: starter`
+#   2. uncomment the `disk:` block below
+#   3. set env var DB_PATH=/data/audit.db  (already wired via envVars below)
+#   No application code changes are required.
+
+services:
+  - type: web
+    name: amipi-procurement-audit-agent
+    runtime: python
+    plan: free
+    region: oregon            # change if you prefer (e.g. frankfurt, singapore)
+    branch: main
+    autoDeploy: true
+
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && pip install -e ."
+
+    # Streamlit must bind 0.0.0.0:$PORT and run headless. CORS/XSRF are disabled
+    # so Render's external load balancer can reach the container.
+    startCommand: >-
+      streamlit run app/streamlit_app.py
+      --server.port $PORT
+      --server.address 0.0.0.0
+      --server.headless true
+      --server.enableCORS false
+      --server.enableXsrfProtection false
+
+    envVars:
+      # Pin Python to match CI (3.13). Render reads PYTHON_VERSION.
+      - key: PYTHON_VERSION
+        value: "3.13.4"
+
+      # --- LLM configuration (Q3 = gemini live) ---
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      # Secret: set the actual value in the Render dashboard, NOT in this file.
+      - key: GEMINI_API_KEY
+        sync: false
+
+      # --- Paths ---
+      # Supplied sample package ships in the repo under Data/.
+      - key: DATA_DIR
+        value: Data
+      # Ephemeral on free tier. When you add a disk later, change this to
+      # /data/audit.db and uncomment the disk block below.
+      - key: DB_PATH
+        value: runs/audit.db
+      - key: LLM_CACHE_PATH
+        value: runs/llm_cache.json
+
+      # Keep Streamlit usage telemetry off.
+      - key: STREAMLIT_BROWSER_GATHER_USAGE_STATS
+        value: "false"
+
+    # --- Persistent disk (DISABLED on free tier) --------------------------
+    # Uncomment together with `plan: starter` to keep review decisions across
+    # restarts. Then set DB_PATH=/data/audit.db above.
+    # disk:
+    #   name: audit-data
+    #   mountPath: /data
+    #   sizeGB: 1
