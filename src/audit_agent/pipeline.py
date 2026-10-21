@@ -86,8 +86,9 @@ def _decide_match(q: Quote, po_lines: list[POLine], ai: AIService, s: Settings) 
     chosen = by_key.get(dec.po_line_key) if dec.po_line_key else None
     rationale = f"AI ({ai.name}) chose {dec.po_line_key} @ {dec.confidence:.2f}: {dec.rationale} | rules top {top.po.key} @ {top.score:.2f}"
     if chosen is None or dec.confidence < s.llm_min_confidence:
-        return MatchResult(po_line_key=None, proposed_po_line_key=(chosen or top).po.key, method="rules+llm", confidence=dec.confidence,
-                           trustworthy=False, rationale=rationale, candidates=cdicts, llm_used=True), (chosen or top).po, cands
+        fallback = chosen or top  # proposed-only (untrusted): the AI's pick if usable, else the rules leader
+        return MatchResult(po_line_key=None, proposed_po_line_key=fallback.po.key, method="rules+llm", confidence=dec.confidence,
+                           trustworthy=False, rationale=rationale, candidates=cdicts, llm_used=True), fallback.po, cands
     if chosen.po.key != top.po.key:
         return MatchResult(po_line_key=None, proposed_po_line_key=chosen.po.key, method="rules+llm", confidence=dec.confidence,
                            trustworthy=False, rationale="Disagreement: " + rationale, candidates=cdicts, llm_used=True), chosen.po, cands
@@ -401,5 +402,7 @@ def compute_metrics(run: AuditRun, source_records: int = 0) -> dict[str, Any]:
         "ingestion_errors": sum(i.severity.value == "error" for i in run.ingestion_issues),
         "ai_calls_ok": sum(e.status == "ok" for e in run.ai_events), "ai_errors": sum(e.status == "error" for e in run.ai_events),
         "ai_rejections": sum(e.status == "rejected" for e in run.ai_events),
-        "auto_approved": 0,
+        # Safety invariant, not a tunable: the system never sets an "approved" state — only the
+        # human review store can. Derived (not hardcoded) so the guarantee is checked every run.
+        "auto_approved": sum(getattr(f, "status", None) == "APPROVED" for f in fs),
     }

@@ -55,6 +55,18 @@ class ReviewStore:
         with self._conn() as c:
             c.executescript(SCHEMA)
 
+    def _configure(self, c: sqlite3.Connection) -> None:
+        """Make the file-backed store safe under concurrent readers/writers.
+
+        WAL lets readers and a writer coexist; busy_timeout makes writers wait for a
+        lock instead of raising 'database is locked' immediately. No-op for in-memory.
+        """
+        if self._mem is not None:
+            return
+        c.execute("PRAGMA journal_mode=WAL")
+        c.execute("PRAGMA synchronous=NORMAL")
+        c.execute("PRAGMA busy_timeout=10000")
+
     @contextmanager
     def _conn(self) -> Iterator[sqlite3.Connection]:
         if self._mem is not None:
@@ -63,6 +75,7 @@ class ReviewStore:
             return
         c = sqlite3.connect(self.path, timeout=10)
         try:
+            self._configure(c)
             yield c
             c.commit()
         finally:
@@ -82,12 +95,15 @@ class ReviewStore:
         if decision == "approved" and finding.status != "WITHIN_TOLERANCE" and len(reason) < 25:
             raise ReviewError("approving a FLAG/NEEDS_REVIEW finding requires a detailed justification (>= 25 chars)")
         ts = datetime.now(timezone.utc).isoformat(timespec="seconds")
-        with self._conn() as c:
-            c.execute(
-                "INSERT INTO reviews (quote_id, fingerprint, run_id, decision, reviewer, reason, override_expected_total_usd,"
-                " status_at_review, calculated_expected_usd, quoted_total_usd, timestamp) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-                (finding.quote_id, finding.fingerprint, run_id, decision, reviewer, reason, override_expected_total_usd,
-                 finding.status, finding.expected_total_usd, finding.quoted_total_usd, ts))
+        try:
+            with self._conn() as c:
+                c.execute(
+                    "INSERT INTO reviews (quote_id, fingerprint, run_id, decision, reviewer, reason, override_expected_total_usd,"
+                    " status_at_review, calculated_expected_usd, quoted_total_usd, timestamp) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                    (finding.quote_id, finding.fingerprint, run_id, decision, reviewer, reason, override_expected_total_usd,
+                     finding.status, finding.expected_total_usd, finding.quoted_total_usd, ts))
+        except sqlite3.OperationalError as e:
+            raise ReviewError(f"Could not save the decision (store busy): {e}. Please retry.") from e
         return HumanReview(decision=decision, reviewer=reviewer, reason=reason, timestamp=ts,
                            override_expected_total_usd=override_expected_total_usd)
 

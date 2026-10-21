@@ -1,3 +1,6 @@
+# Pinned for reproducibility. Developed/tested on Python 3.11 and 3.13 (see CI).
+# Note: pandas is pinned to a recent major (3.x); if your deploy base image lags, pin a
+# compatible 2.x and re-run `pytest` to confirm (the code uses only stable pandas APIs).
 google-genai==2.31.0
 openpyxl==3.1.5
 pandas==3.0.6
