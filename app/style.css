@@ -35,6 +35,21 @@ header[data-testid="stHeader"] { background: transparent; height: 0; }
 .hero .meta span { font-family:var(--display); font-size:.62rem; letter-spacing:2px; text-transform:uppercase; color:var(--hero-muted); }
 .hero .meta b { font-family:var(--head); font-weight:500; font-size:.82rem; color:var(--hero-ink); text-align:right; }
 
+/* ---------- Hallmark popover (run provenance, hidden until clicked) ---------- */
+/* The trigger button: right-aligned, subtle outline so it reads as secondary to the hero */
+[data-testid="stPopover"] { display:flex; justify-content:flex-end; margin:-6px 0 var(--gap); }
+[data-testid="stPopover"] > div > button { background:var(--paper) !important; border:1.5px solid var(--btn-border) !important;
+  color:var(--gold-deep) !important; letter-spacing:2.5px !important; box-shadow:var(--shadow) !important; }
+[data-testid="stPopover"] > div > button p { color:var(--gold-deep) !important; letter-spacing:2.5px !important; }
+[data-testid="stPopover"] > div > button:hover { filter:brightness(1.02); border-color:var(--gold-deep) !important; }
+/* The floating content */
+.hallmark-pop { min-width:260px; }
+.hallmark-pop .hm-row { display:flex; justify-content:space-between; gap:18px; align-items:baseline; padding:7px 0;
+  border-bottom:1px dashed var(--rule); }
+.hallmark-pop .hm-row:last-child { border-bottom:0; }
+.hallmark-pop .hm-row span { font-family:var(--display); font-size:.6rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+.hallmark-pop .hm-row b { font-family:var(--head); font-weight:500; font-size:.82rem; color:var(--ink); text-align:right; word-break:break-word; }
+
 /* ---------- KPI cards ---------- */
 .kpis { display:grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--gap); margin: 0 0 var(--gap); }
 .kpi { position:relative; display:flex; flex-direction:column; padding:22px 22px 20px; border-radius: var(--r-lg);

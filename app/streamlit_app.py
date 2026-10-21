@@ -154,9 +154,17 @@ st.markdown(f"""
   {diamond(50, "h")}
   <div><div class="eyebrow">AMIPI · Procurement Audit · Fine Jewellery</div><h1>Quotation Audit Atelier</h1>
   <div class="tag">Every carat, gram and setting — reconciled against policy, with evidence you can trace.</div></div>
-  <div class="meta"><div class="meta-cap">◈ Hallmark</div><span>Run</span><b>{esc(run.run_id)}</b><span>AI provider</span><b>{esc(run.provider)}</b>
-  <span>Rules</span><b>{esc(run.config_hash)}</b><span>Tolerance</span><b>${run.settings.tolerance} · {esc(run.settings.rounding_mode)}</b></div>
 </div></div>""", unsafe_allow_html=True)
+
+# Run provenance ("Hallmark") is hidden by default — revealed on click to keep the hero clean.
+with st.popover("◈ Hallmark", help="Run provenance — the trace that makes this audit reproducible"):
+    st.markdown(f"""<div class="hallmark-pop">
+      <div class="hm-row"><span>Run</span><b>{esc(run.run_id)}</b></div>
+      <div class="hm-row"><span>AI provider</span><b>{esc(run.provider)}</b></div>
+      <div class="hm-row"><span>Rules</span><b>{esc(run.config_hash)}</b></div>
+      <div class="hm-row"><span>Tolerance</span><b>${run.settings.tolerance} · {esc(run.settings.rounding_mode)}</b></div>
+      <div class="hm-row"><span>Started</span><b>{esc(run.started_at)}</b></div>
+    </div>""", unsafe_allow_html=True)
 
 pending = sum(f.human_review.decision == "pending" for f in run.findings)
 st.markdown(V.kpi_row([
