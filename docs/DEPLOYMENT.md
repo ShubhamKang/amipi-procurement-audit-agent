@@ -1,5 +1,8 @@
 # Deployment guide
 
+**Live deployment:** https://amipi-procurement-audit-agent-cjckcaeiqvvkjzmjbbmnmb.streamlit.app/
+(Streamlit Community Cloud · `main` branch · entrypoint `app/streamlit_app.py`.)
+
 This tool was built for a local, single-reviewer workflow. It can be deployed, but a few
 production concerns must be handled first. Read this before exposing it beyond localhost.
 

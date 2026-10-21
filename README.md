@@ -2,6 +2,16 @@
 
 An auditable web tool that reconciles supplier quotations (PDF + register CSV) against purchase orders, vendor rate cards and the binding procurement policy. It computes the policy price exactly, explains every discrepancy with traceable evidence and policy citations, and records human review decisions. **Nothing is ever approved automatically.**
 
+## 🔗 Live demo
+
+**https://amipi-procurement-audit-agent-cjckcaeiqvvkjzmjbbmnmb.streamlit.app/**
+
+Deployed on Streamlit Community Cloud. The app loads the supplied sample package and runs an audit automatically.
+If a password prompt appears, use the `APP_PASSWORD` shared with the reviewer. (Streamlit free-tier apps sleep when
+idle — the first load may take ~30s to wake. Review decisions are not persisted across restarts on the free tier;
+see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).)
+
+
 - Deterministic `Decimal` engine is the only source of monetary values.
 - AI (Google Gemini) is used for semantic product matching, fallback PDF extraction and reviewer-facing explanations; every AI output is validated and can be disabled or mocked.
 - Supplier text is treated as untrusted data; embedded instructions are detected and quarantined.
