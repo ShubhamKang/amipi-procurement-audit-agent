@@ -4,12 +4,12 @@ An auditable web tool that reconciles supplier quotations (PDF + register CSV) a
 
 ## 🔗 Live demo
 
-**https://amipi-procurement-audit-agent.onrender.com/**
+**https://amipi-procurement-audit-agent-cjckcaeiqvvkjzmjbbmnmb.streamlit.app/**
 
-Deployed on Render (free tier · native Python · Blueprint `render.yaml`). The app loads the supplied sample
-package and runs an audit automatically. (Render free-tier services sleep after ~15 min idle — the first load
-may take ~30–50s to wake. The free tier has no persistent disk, so review decisions reset on redeploy/restart;
-see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the always-on + durable upgrade path.)
+Deployed on Streamlit Community Cloud. The app loads the supplied sample package and runs an audit automatically.
+No sign-in is required — the app is open. (Streamlit free-tier apps sleep when idle — the first load may take
+~30s to wake. Review decisions are not persisted across restarts on the free tier;
+see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).)
 
 
 - Deterministic `Decimal` engine is the only source of monetary values.

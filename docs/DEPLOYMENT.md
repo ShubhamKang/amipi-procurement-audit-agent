@@ -1,7 +1,7 @@
 # Deployment guide
 
-**Live deployment:** https://amipi-procurement-audit-agent.onrender.com/
-(Render · free tier · native Python · Blueprint `render.yaml` · `main` branch · entrypoint `app/streamlit_app.py`.)
+**Live deployment:** https://amipi-procurement-audit-agent-cjckcaeiqvvkjzmjbbmnmb.streamlit.app/
+(Streamlit Community Cloud · `main` branch · entrypoint `app/streamlit_app.py`.)
 
 This tool was built for a local, single-reviewer workflow. It can be deployed, but a few
 production concerns must be handled first. Read this before exposing it beyond localhost.
@@ -47,10 +47,8 @@ gracefully; it is still not intended for high-concurrency multi-tenant use.
 |---|---|---|
 | Local / on-prem VM | Disk | Simplest; set `APP_PASSWORD`, serve behind nginx + TLS |
 | Docker + volume | Volume | Mount `/data`; set `DB_PATH=/data/audit.db` |
-| Render (free) · **current** | **Ephemeral** | Live demo; sleeps when idle, decisions reset on redeploy. Deployed via `render.yaml` |
-| Render (Starter + disk) | Volume | Always-on + durable; set `plan: starter`, add the `disk:` block, `DB_PATH=/data/audit.db` |
-| Streamlit Community Cloud | **Ephemeral** | Demo only, or external DB; secrets via app settings |
-| Docker + volume / Fly / Railway | Volume | Mount `/data`; set `DB_PATH=/data/audit.db` |
+| Streamlit Community Cloud · **current** | **Ephemeral** | Live demo; sleeps when idle, decisions reset on restart. Secrets via app settings |
+| Render / Fly / Railway | Volume add-on | Attach a disk, set `DB_PATH` onto it |
 
 ### Run command
 
@@ -58,20 +56,6 @@ gracefully; it is still not intended for high-concurrency multi-tenant use.
 pip install -r requirements.txt && pip install -e .
 streamlit run app/streamlit_app.py --server.headless true --server.port $PORT
 ```
-
-On Render these are defined in `render.yaml` (no manual dashboard config needed):
-
-```bash
-# build
-pip install --upgrade pip && pip install -r requirements.txt && pip install -e .
-# start
-streamlit run app/streamlit_app.py --server.port $PORT --server.address 0.0.0.0 \
-  --server.headless true --server.enableCORS false --server.enableXsrfProtection false
-```
-
-`--server.address 0.0.0.0` and the disabled CORS/XSRF flags are required so Render's
-external load balancer can reach the container. Deploy with **New + → Blueprint → select
-the repo → Apply**, then paste `GEMINI_API_KEY` when prompted (it is marked `sync: false`).
 
 ## 5. Pre-deploy checklist
 
