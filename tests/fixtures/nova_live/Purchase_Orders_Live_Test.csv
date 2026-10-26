@@ -1,0 +1,13 @@
+line_id,po_number,po_date,product_material,product_category,quantity
+L01,PO-101,2026-10-17,18K,Bracelet,2
+L02,PO-102,2026-10-10,18K,Bracelet,1
+L03,PO-103,2026-10-16,18K,Bracelet,3
+L04,PO-104,2026-10-15,18K,Bracelet,4
+L05,PO-105,2026-10-16,14K,Bracelet,2
+L06,PO-106,2026-10-16,18K,Necklace,1
+L07,PO-107,2026-10-16,18KT,Tennis Bracelet,5
+L08,PO-108,2026-10-16,18K Yellow Gold,Bangle Bracelet,1
+L09,PO-109,2026-10-16,Platinum,Bracelet,2
+L10,PO-110,2026-10-14,18K,Bracelet,2
+L11,PO-111,2026-10-20,18K,Bracelet,1
+L12,PO-112,2026-10-17,18K,Ring,3

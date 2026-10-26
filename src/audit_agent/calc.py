@@ -24,6 +24,7 @@ def compute_expected(
     set_pcs: Decimal | None = None,
     labor_multiplier: Decimal = Decimal(1),
     force_finish: bool | None = None,
+    surcharge: Decimal | None = None,
 ) -> CostBreakdown:
     """Expected line total per policy Rules 2-7.
 
@@ -36,6 +37,14 @@ def compute_expected(
       finish   = Rhodium fee only if PO finish is Rhodium
       unit     = round(subtotal + handling + finish)
       total    = round(unit x qty)
+
+    The optional `surcharge` is an INTERNAL AUDIT ADJUSTMENT (Nova 18K bracelet
+    rule). It never alters `total` (the policy price) and never touches the
+    supplier's quoted total; it only produces `adjusted_total = total +
+    surcharge`. Eligibility/amount are decided upstream by the pure
+    surcharge module; the engine only records the already-decided amount so the
+    engine stays the single source of money. Defaults to 0 so existing callers
+    are unchanged (adjusted_total == total).
     Keyword overrides exist only for what-if diagnostics, never for the audited value.
     """
     q = po.qty if qty is None else qty
@@ -50,15 +59,19 @@ def compute_expected(
     finish = money(rate.finish_rhodium_usd_per_unit, s) if apply_finish else Decimal("0.00")
     unit = money(subtotal + handling + finish, s)
     total = money(unit * q, s)
+    sur = money(surcharge if surcharge is not None else Decimal("0"), s)
+    adjusted = money(total + sur, s)
     return CostBreakdown(
         rate_id=rate.rate_id, metal=money(metal, s), setting=money(setting, s), labor=money(labor, s),
         subtotal=money(subtotal, s), handling=handling, finish=finish, unit_cost=unit, qty=q, total=total,
+        surcharge=sur, adjusted_total=adjusted,
         inputs={
             "metal_g": str(po.metal_g), "metal_usd_per_gram": str(rate.metal_usd_per_gram),
             "set_pcs": str(pcs), "setting_usd_per_stone": str(rate.setting_usd_per_stone),
             "labor_usd_per_unit": str(rate.labor_usd_per_unit), "handling_rate": str(rate.handling_rate),
             "finish": po.finish, "rhodium_usd_per_unit": str(rate.finish_rhodium_usd_per_unit),
             "qty": str(q), "rounding": f"{s.rounding_mode} @ {s.money_places}dp",
+            "surcharge": str(sur),
         },
     )
 
