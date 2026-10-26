@@ -26,6 +26,17 @@ priority:
   p1_abs_variance_usd: "50"
   p2_abs_variance_usd: "0.01"
 
+# Live change (feature/nova-18k-bracelet-surcharge): Fictional Nova Manufacturing.
+# Flat per-unit surcharge on 18K-gold bracelet-family items, gated by BOTH the
+# quotation date AND the linked PO date being >= effective_date (inclusive).
+# Internal audit adjustment only; never overwrites supplier-quoted totals.
+surcharge:
+  enabled: true
+  amount_usd: "15.00"            # flat surcharge per qualifying UNIT (x quantity)
+  effective_date: "2026-10-15"   # inclusive; both quote date and PO date must be >=
+  metal_prefixes: ["18K", "18KT"]  # case-insensitive prefix match ("18K Yellow Gold" -> matches "18K")
+  bracelet_categories: ["Bracelet", "Tennis Bracelet", "Bangle Bracelet"]
+
 security:
   injection_patterns:
     - "ignore (all|any|previous|prior|the)\\b"

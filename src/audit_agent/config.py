@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import os
 from dataclasses import dataclass
+from datetime import date
 from decimal import ROUND_HALF_EVEN, ROUND_HALF_UP, ROUND_DOWN, ROUND_UP, Decimal
 from pathlib import Path
 from typing import Any
@@ -41,6 +42,13 @@ class Settings:
     p1_abs_variance: Decimal
     p2_abs_variance: Decimal
     injection_patterns: tuple[str, ...]
+    # Nova 18K bracelet per-unit surcharge (live change). Internal audit
+    # adjustment only; parsed with safe defaults so policies without the block load.
+    surcharge_enabled: bool
+    surcharge_amount_usd: Decimal
+    surcharge_effective_date: date | None
+    surcharge_metal_prefixes: tuple[str, ...]
+    surcharge_bracelet_categories: tuple[str, ...]
     config_hash: str
 
     @property
@@ -68,6 +76,9 @@ def settings_from_dict(raw: dict[str, Any]) -> Settings:
     matching = raw.get("matching", {}) or {}
     prio = raw.get("priority", {}) or {}
     sec = raw.get("security", {}) or {}
+    sur = raw.get("surcharge", {}) or {}
+    sur_date_raw = sur.get("effective_date")
+    sur_date = date.fromisoformat(str(sur_date_raw)) if sur_date_raw else None
     digest = hashlib.sha256(yaml.safe_dump(raw, sort_keys=True).encode()).hexdigest()[:12]
     return Settings(
         tolerance=Decimal(str(raw.get("tolerance_usd", "0.01"))),
@@ -85,6 +96,11 @@ def settings_from_dict(raw: dict[str, Any]) -> Settings:
         p1_abs_variance=Decimal(str(prio.get("p1_abs_variance_usd", "50"))),
         p2_abs_variance=Decimal(str(prio.get("p2_abs_variance_usd", "0.01"))),
         injection_patterns=tuple(sec.get("injection_patterns", []) or []),
+        surcharge_enabled=bool(sur.get("enabled", False)),
+        surcharge_amount_usd=Decimal(str(sur.get("amount_usd", "0.00"))),
+        surcharge_effective_date=sur_date,
+        surcharge_metal_prefixes=_lower_tuple(sur.get("metal_prefixes", [])),
+        surcharge_bracelet_categories=_lower_tuple(sur.get("bracelet_categories", [])),
         config_hash=digest,
     )
 

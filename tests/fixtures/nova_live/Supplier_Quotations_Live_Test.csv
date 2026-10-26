@@ -1,0 +1,13 @@
+quote_line_id,po_reference,quotation_date,vendor,base_unit_cost_usd,quoted_total_usd,currency
+L01,PO-101,2026-10-18,Fictional Nova Manufacturing,310.00,620.00,USD
+L02,PO-102,2026-10-20,Fictional Nova Manufacturing,240.00,240.00,USD
+L03,PO-103,2026-10-14,Fictional Nova Manufacturing,400.00,1200.00,USD
+L04,PO-104,2026-10-15,Fictional Nova Manufacturing,220.00,880.00,USD
+L05,PO-105,2026-10-19,Fictional Nova Manufacturing,195.00,390.00,USD
+L06,PO-106,2026-10-19,Fictional Nova Manufacturing,510.00,510.00,USD
+L07,PO-107,2026-10-19,Fictional Nova Manufacturing,180.00,900.00,USD
+L08,PO-108,2026-10-19,Fictional Nova Manufacturing,630.00,630.00,USD
+L09,PO-109,2026-10-19,Fictional Nova Manufacturing,750.00,1500.00,USD
+L10,PO-110,2026-10-19,Fictional Nova Manufacturing,225.00,450.00,USD
+L11,PO-111,2026-10-20,Fictional Nova Manufacturing,330.00,330.00,USD
+L12,PO-112,2026-10-18,Fictional Nova Manufacturing,150.00,450.00,USD

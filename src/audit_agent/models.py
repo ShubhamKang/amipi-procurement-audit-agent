@@ -165,6 +165,10 @@ class CostBreakdown(BaseModel):
     unit_cost: Decimal
     qty: Decimal
     total: Decimal
+    # Nova surcharge: internal audit adjustment only. Defaults keep existing
+    # callers/serialized records unchanged (surcharge 0 -> adjusted_total == total).
+    surcharge: Decimal = Decimal("0.00")
+    adjusted_total: Decimal = Decimal("0.00")
     inputs: dict[str, str]
 
 
